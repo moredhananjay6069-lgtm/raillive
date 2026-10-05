@@ -3,63 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RailLive — Indian Railways Live Train Location</title>
+<title>रेललाइव RailLive — Indian Railways Live Train Location</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
-  --bg:#eef1f6;
-  --bg-2:#e2e8f1;
-  --surface:#ffffff;
-  --surface-2:#f6f8fb;
-  --surface-3:#eef2f8;
-  --border:rgba(18,58,99,0.14);
-  --border-strong:rgba(18,58,99,0.26);
-  --text:#0d2033;
-  --text-dim:#5b6c81;
-  --text-faint:#8496a8;
-  --navy:#123a63;
-  --navy-2:#1b5288;
-  --gold:#bd8c1a;
-  --gold-2:#e2b84e;
-  --green:#0f7a58;
-  --green-bg:rgba(15,122,88,0.12);
-  --amber:#a9670a;
-  --amber-bg:rgba(169,103,10,0.13);
-  --red:#bd3b2c;
-  --red-bg:rgba(189,59,44,0.12);
-  --track:#c6d1e0;
-  --shadow:0 1px 2px rgba(13,32,51,0.05), 0 8px 24px -12px rgba(13,32,51,0.22);
-  --shadow-lg:0 2px 4px rgba(13,32,51,0.06), 0 24px 48px -20px rgba(13,32,51,0.34);
-  --radius:14px;
-  --font-body:'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --bg:#f6eedd; --bg-2:#efe2cb;
+  --surface:#fffdf7; --surface-2:#f8f0e0; --surface-3:#f1e6d1;
+  --border:rgba(122,31,43,0.16); --border-strong:rgba(122,31,43,0.32);
+  --text:#2b1a11; --text-dim:#7b6650; --text-faint:#a08e78;
+  --maroon:#7a1f2b; --maroon-2:#9c2f3a; --maroon-bg:rgba(122,31,43,0.10);
+  --saffron:#c2640a; --saffron-2:#e08a1e; --saffron-bg:rgba(194,100,10,0.13);
+  --gold:#b07d10; --gold-2:#d9ab3c;
+  --indigo:#26315c; --teal:#0f6b5c;
+  --green:#2f7d4f; --green-bg:rgba(47,125,79,0.13);
+  --red:#b23a2e; --red-bg:rgba(178,58,46,0.12);
+  --track:#d8c6a8;
+  --shadow:0 1px 2px rgba(43,26,17,0.06), 0 10px 26px -14px rgba(43,26,17,0.34);
+  --shadow-lg:0 2px 6px rgba(43,26,17,0.07), 0 26px 52px -22px rgba(43,26,17,0.46);
+  --radius:16px;
+  --font-display:'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+  --font-body:'Mukta', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
 }
 html[data-theme="dark"]{
-  --bg:#0a1420;
-  --bg-2:#0d1a28;
-  --surface:#111f2e;
-  --surface-2:#16273a;
-  --surface-3:#0e1c2a;
-  --border:rgba(255,255,255,0.09);
-  --border-strong:rgba(255,255,255,0.18);
-  --text:#e8eff8;
-  --text-dim:#93a7bd;
-  --text-faint:#6c8098;
-  --navy:#2e6ba6;
-  --navy-2:#3f83c4;
-  --gold:#e2b84e;
-  --gold-2:#f0cf78;
-  --green:#37c78e;
-  --green-bg:rgba(55,199,142,0.14);
-  --amber:#e0a94a;
-  --amber-bg:rgba(224,169,74,0.15);
-  --red:#ef6b5b;
-  --red-bg:rgba(239,107,91,0.15);
-  --track:#28405a;
-  --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px -14px rgba(0,0,0,0.7);
-  --shadow-lg:0 2px 6px rgba(0,0,0,0.5), 0 28px 60px -24px rgba(0,0,0,0.85);
+  --bg:#1b120b; --bg-2:#150e08;
+  --surface:#261a11; --surface-2:#2f2116; --surface-3:#1f150d;
+  --border:rgba(226,184,78,0.16); --border-strong:rgba(226,184,78,0.34);
+  --text:#f2e7d4; --text-dim:#c0a988; --text-faint:#8f7a5e;
+  --maroon:#c8515f; --maroon-2:#e07580; --maroon-bg:rgba(200,81,95,0.16);
+  --saffron:#e79a2e; --saffron-2:#f4b95a; --saffron-bg:rgba(231,154,46,0.16);
+  --gold:#e2b84e; --gold-2:#f2d47e;
+  --indigo:#8ea0e0; --teal:#3fc0a8;
+  --green:#5fc48a; --green-bg:rgba(95,196,138,0.16);
+  --red:#ef7466; --red-bg:rgba(239,116,102,0.16);
+  --track:#4a3826;
+  --shadow:0 1px 2px rgba(0,0,0,0.5), 0 12px 30px -16px rgba(0,0,0,0.8);
+  --shadow-lg:0 2px 6px rgba(0,0,0,0.55), 0 30px 60px -26px rgba(0,0,0,0.9);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -67,631 +49,753 @@ body{
   font-family:var(--font-body);
   color:var(--text);
   background:
-    radial-gradient(1100px 520px at 12% -8%, rgba(18,58,99,0.10), transparent 62%),
-    radial-gradient(900px 480px at 100% 0%, rgba(189,140,26,0.10), transparent 60%),
+    radial-gradient(1100px 520px at 10% -10%, rgba(194,100,10,0.12), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(122,31,43,0.10), transparent 58%),
     linear-gradient(var(--bg), var(--bg-2));
-  background-attachment:fixed;
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-  line-height:1.5;
+  background-attachment:fixed; min-height:100vh; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
 .mono{font-family:var(--font-mono)}
-.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 64px}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 18px 60px}
 
-/* ---------- Header ---------- */
+/* traditional textile trim */
+.trim{height:10px;border-radius:3px;
+  background:
+    repeating-linear-gradient(45deg, var(--maroon) 0 7px, transparent 7px 14px),
+    repeating-linear-gradient(-45deg, var(--saffron) 0 7px, transparent 7px 14px),
+    var(--gold-2);
+  opacity:.85; margin-bottom:16px}
+
+/* ---------- header ---------- */
 .topbar{
-  display:flex;align-items:center;gap:16px;
-  padding:14px 18px;margin-bottom:22px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:14px 18px;margin-bottom:16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow); position:relative; overflow:hidden;
 }
-.brand{display:flex;align-items:center;gap:13px;min-width:0}
-.logo{
-  width:44px;height:44px;flex:none;border-radius:11px;
-  background:linear-gradient(150deg,var(--navy),var(--navy-2));
-  display:grid;place-items:center;color:var(--gold-2);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.14);
-}
-.brand h1{font-size:19px;margin:0;letter-spacing:-0.02em;font-weight:700}
-.brand .sub{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint)}
+.topbar::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(122,31,43,0.045) 42px 43px);}
+.brand{display:flex;align-items:center;gap:14px;min-width:0;position:relative}
+.medallion{width:52px;height:52px;flex:none;color:var(--maroon)}
+.medallion svg{width:100%;height:100%;display:block}
+html[data-theme="dark"] .medallion{color:var(--gold-2)}
+.brand h1{font-family:var(--font-display);font-size:22px;margin:0;line-height:1.05;letter-spacing:0.01em}
+.brand h1 .dv{color:var(--maroon);font-size:24px}
+html[data-theme="dark"] .brand h1 .dv{color:var(--gold-2)}
+.brand .sub{font-size:11.5px;color:var(--text-faint);letter-spacing:0.02em;margin-top:2px}
 .topbar .spacer{flex:1}
-.live-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
-  padding:7px 12px;border-radius:999px;border:1px solid var(--border);
-  background:var(--surface-2);color:var(--text-dim);white-space:nowrap;
-}
+.feed-pill{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);
+  font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);white-space:nowrap}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
-.dot.paused{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
-.icon-btn{
-  width:40px;height:40px;flex:none;border-radius:10px;cursor:pointer;
-  border:1px solid var(--border);background:var(--surface-2);color:var(--text);
-  display:grid;place-items:center;transition:background .15s,border-color .15s;
-}
+.dot.paused{background:var(--saffron);box-shadow:0 0 0 3px var(--saffron-bg)}
+.dot.live{background:var(--maroon);box-shadow:0 0 0 3px var(--maroon-bg)}
+.icon-btn{width:40px;height:40px;flex:none;border-radius:11px;cursor:pointer;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);display:grid;place-items:center;transition:.15s}
 .icon-btn:hover{background:var(--surface-3);border-color:var(--border-strong)}
 
-/* ---------- Search ---------- */
-.searchbar{
-  display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;
-}
-.field{
-  flex:1;min-width:240px;display:flex;align-items:center;gap:10px;
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:0 14px;box-shadow:var(--shadow);
-}
+/* ---------- search ---------- */
+.searchbar{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.field{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--surface);
+  border:1px solid var(--border);border-radius:13px;padding:0 14px;box-shadow:var(--shadow)}
 .field svg{flex:none;color:var(--text-faint)}
-.field input{
-  flex:1;border:0;outline:0;background:transparent;color:var(--text);
-  font-family:var(--font-mono);font-size:14.5px;padding:15px 0;letter-spacing:0.02em;
-}
-.field input::placeholder{color:var(--text-faint)}
-.btn{
-  border:0;cursor:pointer;border-radius:12px;padding:0 22px;height:50px;
-  font-family:var(--font-body);font-weight:600;font-size:14.5px;letter-spacing:0.01em;
-  background:linear-gradient(150deg,var(--navy),var(--navy-2));color:#fff;
-  box-shadow:var(--shadow);transition:filter .15s,transform .1s;
-}
-.btn:hover{filter:brightness(1.08)}
-.btn:active{transform:translateY(1px)}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-.chip{
-  cursor:pointer;font-family:var(--font-mono);font-size:11.5px;letter-spacing:0.03em;
-  padding:7px 13px;border-radius:999px;border:1px solid var(--border);
-  background:var(--surface);color:var(--text-dim);transition:all .15s;
-}
-.chip:hover{border-color:var(--gold);color:var(--text)}
-.chip.active{background:var(--gold);border-color:var(--gold);color:#2a1e05;font-weight:600}
+.field input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-family:var(--font-mono);
+  font-size:14.5px;padding:15px 0;letter-spacing:0.02em}
+.field input::placeholder{color:var(--text-faint);font-family:var(--font-body)}
+.btn{border:0;cursor:pointer;border-radius:13px;padding:0 22px;height:50px;font-family:var(--font-body);
+  font-weight:600;font-size:15px;background:linear-gradient(150deg,var(--maroon),var(--maroon-2));color:#fff;
+  box-shadow:var(--shadow);transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+.seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.seg button{border:0;background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--font-body);
+  font-weight:600;font-size:13.5px;padding:0 16px;height:50px;transition:.15s}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button.active{background:var(--saffron);color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{cursor:pointer;font-family:var(--font-mono);font-size:11.5px;padding:7px 13px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.chip:hover{border-color:var(--saffron);color:var(--text)}
+.chip.active{background:var(--maroon);border-color:var(--maroon);color:#fff;font-weight:600}
 
-/* ---------- Hero ---------- */
-.hero{
-  position:relative;overflow:hidden;
-  background:linear-gradient(155deg,var(--navy),#0c2b4b);
-  border-radius:18px;padding:26px 26px 22px;color:#eaf1f9;
-  box-shadow:var(--shadow-lg);margin-bottom:18px;
-}
-html[data-theme="dark"] .hero{background:linear-gradient(155deg,#12314f,#0a1c2e);border:1px solid var(--border)}
-.hero::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.05) 0 1px,transparent 1px 46px);
-  opacity:.6;
-}
-.hero-top{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;position:relative}
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{position:relative;cursor:pointer;border:0;background:transparent;font-family:var(--font-body);font-weight:600;
+  font-size:14.5px;color:var(--text-dim);padding:11px 16px;border-bottom:3px solid transparent;transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--maroon);border-bottom-color:var(--maroon)}
+html[data-theme="dark"] .tab.active{color:var(--gold-2);border-bottom-color:var(--gold-2)}
+.view{display:none} .view.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:26px 26px 22px;color:#fdf6ea;
+  background:linear-gradient(155deg,#6d1c27,#8f2a36 55%,#7a1f2b);box-shadow:var(--shadow-lg);margin-bottom:18px;
+  border:1px solid rgba(226,184,78,0.35)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.045) 0 1px,transparent 1px 44px);opacity:.7}
+.hero .corner{position:absolute;width:74px;height:74px;opacity:.5;color:var(--gold-2)}
+.hero .corner.tl{top:8px;left:8px} .hero .corner.br{bottom:8px;right:8px;transform:rotate(180deg)}
+.hero-top{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
 .train-id{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.train-no{
-  font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:0.02em;
-  color:var(--gold-2);
-}
-.train-name{font-size:19px;font-weight:600;letter-spacing:-0.01em;max-width:620px}
-.route-line{font-family:var(--font-mono);font-size:12.5px;color:#a9c2dc;margin-top:5px;letter-spacing:0.03em}
-.status-badge{
-  display:inline-flex;align-items:center;gap:9px;align-self:flex-start;
-  padding:9px 15px;border-radius:999px;font-weight:600;font-size:13.5px;
-  background:var(--amber-bg);color:#ffd98a;border:1px solid rgba(255,255,255,0.14);
-  white-space:nowrap;
-}
-.status-badge.on-time{background:var(--green-bg);color:#8ff0c6}
-.status-badge.late{background:var(--red-bg);color:#ffb3a8}
-.hero-kpis{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:24px;position:relative;
-  border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.06);
-}
-.hero-kpi{padding:14px 16px;background:rgba(255,255,255,0.04)}
-.hero-kpi .k{font-family:var(--font-mono);font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:#9db6d1}
-.hero-kpi .v{font-family:var(--font-mono);font-size:21px;font-weight:600;margin-top:4px;color:#fff;letter-spacing:0.01em}
-.hero-kpi .v small{font-size:12px;font-weight:400;color:#9db6d1;margin-left:3px}
-
-/* progress */
-.progwrap{position:relative;margin-top:22px}
-.progtrack{height:8px;border-radius:999px;background:rgba(255,255,255,0.14);overflow:hidden}
+.train-no{font-family:var(--font-mono);font-size:30px;font-weight:600;color:var(--gold-2)}
+.train-name{font-family:var(--font-display);font-size:21px;max-width:640px}
+.route-line{font-family:var(--font-mono);font-size:12.5px;color:#e7c9a8;margin-top:6px;letter-spacing:0.03em}
+.status-badge{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;padding:9px 15px;border-radius:999px;
+  font-weight:600;font-size:13.5px;background:var(--saffron-bg);color:#ffd98a;border:1px solid rgba(255,255,255,0.16);white-space:nowrap}
+.status-badge.on-time{background:var(--green-bg);color:#a6f0c9}
+.status-badge.late{background:var(--red-bg);color:#ffb8ad}
+.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:24px;position:relative;z-index:1;
+  border-radius:13px;overflow:hidden;background:rgba(255,255,255,0.07)}
+.hero-kpi{padding:14px 16px;background:rgba(255,255,255,0.05)}
+.hero-kpi .k{font-family:var(--font-mono);font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:#e3c19d}
+.hero-kpi .v{font-family:var(--font-mono);font-size:21px;font-weight:600;margin-top:4px;color:#fff}
+.hero-kpi .v small{font-size:12px;font-weight:400;color:#e3c19d;margin-left:3px}
+.progwrap{position:relative;z-index:1;margin-top:22px}
+.progtrack{height:9px;border-radius:999px;background:rgba(255,255,255,0.16);overflow:hidden}
 .progfill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold-2));transition:width .6s ease}
-.progmeta{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:#9db6d1;margin-top:7px;letter-spacing:0.04em}
+.progmeta{display:flex;justify-content:space-between;gap:10px;font-family:var(--font-mono);font-size:11px;color:#e3c19d;margin-top:7px;flex-wrap:wrap}
 
-/* ---------- Grid ---------- */
+/* ---------- panels ---------- */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 .cols>*{min-width:0}
-.panel{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:var(--shadow);overflow:hidden;
-}
-.panel-head{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:15px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);
-}
-.panel-title{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14.5px}
-.sec-dot{width:8px;height:8px;border-radius:2px;background:var(--gold)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--border);background:var(--surface-2)}
+.panel-title{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-size:16px}
+.lotus{width:16px;height:16px;color:var(--maroon);flex:none}
+html[data-theme="dark"] .lotus{color:var(--gold-2)}
 .panel-head .hint{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
-
-/* route svg */
 .routebox{padding:14px 10px 18px;overflow-x:auto}
 #routeSvg{display:block;margin:0 auto;min-width:320px;width:100%;height:auto}
-
-/* station table */
-.stn-scroll{max-height:520px;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.stn-scroll{max-height:520px;overflow:auto}
 .stn{width:100%;min-width:452px;border-collapse:collapse;font-size:13px}
-.stn thead th{
-  position:sticky;top:0;z-index:2;background:var(--surface-3);
-  font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--text-faint);text-align:left;padding:9px 14px;font-weight:500;
-  border-bottom:1px solid var(--border);
-}
+.stn thead th{position:sticky;top:0;z-index:2;background:var(--surface-3);font-family:var(--font-mono);font-size:10px;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);text-align:left;padding:9px 14px;font-weight:500;border-bottom:1px solid var(--border)}
 .stn td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 .stn tbody tr:last-child td{border-bottom:0}
-.stn tbody tr.passed{opacity:.62}
-.stn tbody tr.current{background:var(--gold-bg, rgba(189,140,26,0.10))}
-.stn .code{font-family:var(--font-mono);font-weight:600;font-size:12px;color:var(--navy-2)}
+.stn tbody tr.passed{opacity:.6}
+.stn tbody tr.current{background:var(--saffron-bg)}
+.stn .code{font-family:var(--font-mono);font-weight:600;font-size:12px;color:var(--maroon)}
+html[data-theme="dark"] .stn .code{color:var(--gold-2)}
 .stn .nm{font-weight:500}
 .stn .nm small{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);font-weight:400}
 .stn .t{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .stn .t.delay{color:var(--red)}
 .stn .plat{font-family:var(--font-mono);font-size:12px;text-align:center}
-.pill{
-  display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;
-  text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap;
-}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:999px;white-space:nowrap}
 .pill.dep{background:var(--surface-3);color:var(--text-faint)}
-.pill.now{background:var(--gold);color:#2a1e05;font-weight:600}
+.pill.now{background:var(--saffron);color:#fff;font-weight:600}
 .pill.next{background:var(--green-bg);color:var(--green);font-weight:600}
 
-/* controls */
-.controls{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  margin-top:18px;padding:14px 18px;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-}
-.controls .lbl{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
-.ctrl-btn{
-  border:1px solid var(--border);background:var(--surface-2);color:var(--text);
-  border-radius:9px;height:38px;padding:0 15px;cursor:pointer;font-family:var(--font-body);
-  font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:all .15s;
-}
-.ctrl-btn:hover{background:var(--surface-3);border-color:var(--border-strong)}
-.rate-group{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
-.rate-group button{
-  border:0;background:var(--surface-2);color:var(--text-dim);cursor:pointer;
-  font-family:var(--font-mono);font-size:12px;padding:0 12px;height:38px;transition:all .15s;
-}
-.rate-group button+button{border-left:1px solid var(--border)}
-.rate-group button.active{background:var(--navy);color:#fff;font-weight:600}
-.scrub{flex:1;min-width:180px;display:flex;align-items:center;gap:10px}
-.scrub input[type=range]{flex:1;accent-color:var(--gold);height:4px}
+/* map */
+#map{height:560px;width:100%;background:var(--surface-3)}
+.leaflet-container{font-family:var(--font-body);background:var(--surface-3)}
+.train-marker{width:34px;height:34px;border-radius:50%;background:var(--maroon);border:2.5px solid var(--gold-2);
+  display:grid;place-items:center;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.4)}
+.train-marker svg{width:18px;height:18px}
+.map-note{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface-2);font-size:12px;color:var(--text-dim)}
 
-/* footer */
-.foot{
-  margin-top:26px;padding:16px 20px;border-radius:var(--radius);
-  border:1px dashed var(--border-strong);background:var(--surface-2);
-  font-size:12.5px;color:var(--text-dim);line-height:1.65;
-}
+/* directory */
+.dir{padding:6px 0}
+.dir-row{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s}
+.dir-row:hover{background:var(--surface-2)}
+.dir-row:last-child{border-bottom:0}
+.dir-no{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--maroon);width:64px;flex:none}
+html[data-theme="dark"] .dir-no{color:var(--gold-2)}
+.dir-main{flex:1;min-width:0}
+.dir-name{font-weight:600;font-size:14px}
+.dir-route{font-family:var(--font-mono);font-size:11px;color:var(--text-faint)}
+.dir-delay{font-family:var(--font-mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.dir-delay.ok{background:var(--green-bg);color:var(--green)}
+.dir-delay.late{background:var(--red-bg);color:var(--red)}
+
+/* results (station / pnr) */
+.result{padding:18px}
+.result h3{font-family:var(--font-display);margin:0 0 4px;font-size:18px}
+.result .sub{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);margin-bottom:14px}
+.hit{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--border);cursor:pointer}
+.hit:last-child{border-bottom:0}
+.hit:hover .hit-name{color:var(--maroon)}
+.pnr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:6px}
+.pnr-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:11px 13px}
+.pnr-cell .k{font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
+.pnr-cell .v{font-weight:600;margin-top:3px}
+
+/* controls */
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:14px 18px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.controls .lbl{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
+.ctrl-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:10px;height:38px;
+  padding:0 15px;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+.ctrl-btn:hover{background:var(--surface-3);border-color:var(--border-strong)}
+.rate-group{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.rate-group button{border:0;background:var(--surface-2);color:var(--text-dim);cursor:pointer;font-family:var(--font-mono);font-size:12px;padding:0 12px;height:38px;transition:.15s}
+.rate-group button+button{border-left:1px solid var(--border)}
+.rate-group button.active{background:var(--maroon);color:#fff;font-weight:600}
+.scrub{flex:1;min-width:180px;display:flex;align-items:center;gap:10px}
+.scrub input[type=range]{flex:1;accent-color:var(--saffron)}
+
+/* settings drawer */
+.drawer{display:none;margin-top:16px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.drawer.open{display:block}
+.drawer h3{font-family:var(--font-display);margin:0 0 4px;font-size:17px}
+.drawer p{font-size:12.5px;color:var(--text-dim);margin:6px 0 12px}
+.drawer label{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin:10px 0 5px}
+.drawer input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);
+  color:var(--text);font-family:var(--font-mono);font-size:13px}
+.drawer .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.tiny{font-family:var(--font-mono);font-size:11px;color:var(--text-faint)}
+
+.foot{margin-top:24px;padding:16px 20px;border-radius:var(--radius);border:1px dashed var(--border-strong);background:var(--surface-2);
+  font-size:12.5px;color:var(--text-dim);line-height:1.65}
 .foot b{color:var(--text)}
 .foot code{font-family:var(--font-mono);font-size:11.5px;background:var(--surface-3);padding:1px 6px;border-radius:5px;border:1px solid var(--border)}
+.notice{margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:13px;border:1px solid var(--border-strong);
+  background:var(--saffron-bg);color:var(--text);display:none}
+.notice.show{display:block}
 
 @media (max-width:860px){
   .cols{grid-template-columns:1fr}
   .hero-kpis{grid-template-columns:repeat(2,1fr)}
-  .train-no{font-size:24px}
-  .train-name{font-size:16.5px}
-  .hero{padding:20px 18px}
-  .wrap{padding:16px 14px 48px}
-  .stn-scroll{max-height:none}
+  .train-no{font-size:24px} .train-name{font-size:18px}
+  .hero{padding:20px 18px} .wrap{padding:16px 14px 48px}
+  .stn-scroll{max-height:none} #map{height:420px}
+  .seg button{padding:0 12px;font-size:12.5px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="mandala" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="37" stroke-width="1"/>
+        <g>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(45 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(90 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(135 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(180 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(225 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(270 50 50)"/>
+          <path d="M50 50 C44 36 44 22 50 12 C56 22 56 36 50 50 Z" fill="currentColor" stroke="none" opacity="0.9" transform="rotate(315 50 50)"/>
+        </g>
+        <circle cx="50" cy="50" r="6" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+    <symbol id="lotus" viewBox="0 0 24 24">
+      <path d="M12 21c-4.4 0-8-2.5-8-6 2 0 3.4.5 4.6 1.4C8.1 14 8 12 8 10c1.8.4 3 1.4 4 2.8C12.9 11.4 13.2 9 12 6c-1.2 3-1 5.4-.9 6.8 1-1.4 2.2-2.4 4-2.8 0 2-.1 4-.6 6.4C15.6 15.5 17 15 19 15c0 3.5-3.6 6-8 6z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
 
-  <!-- Header -->
+<div class="wrap">
+  <div class="trim"></div>
+
   <div class="topbar">
     <div class="brand">
-      <div class="logo">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="5" y="3" width="14" height="14" rx="3"></rect>
-          <path d="M5 10h14"></path>
-          <circle cx="8.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle>
-          <circle cx="15.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle>
-          <path d="M8 20l-2 2M16 20l2 2M9 17v3M15 17v3"></path>
-        </svg>
-      </div>
+      <div class="medallion"><svg><use href="#mandala"/></svg></div>
       <div>
-        <h1>RailLive</h1>
-        <div class="sub">Indian Railways · Live Train Location</div>
+        <h1><span class="dv">रेललाइव</span> · RailLive</h1>
+        <div class="sub">भारतीय रेल · Indian Railways — Live Train Location</div>
       </div>
     </div>
     <div class="spacer"></div>
-    <div class="live-pill"><span class="dot" id="liveDot"></span><span id="liveText">Live feed</span></div>
+    <div class="feed-pill"><span class="dot" id="feedDot"></span><span id="feedText">Demo feed</span></div>
+    <button class="icon-btn" id="settingsBtn" title="Live data settings" aria-label="Live data settings">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 2.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.6h.1A1.6 1.6 0 0 0 8.7 1V1a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 15 2.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1a1.6 1.6 0 0 0 1.5 1h.1a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"></path></svg>
+    </button>
     <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-        <path id="themeIcon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-      </svg>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path id="themeIcon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
     </button>
   </div>
 
-  <!-- Search -->
   <div class="searchbar">
+    <div class="seg" id="modeSeg">
+      <button data-mode="train" class="active">Train</button>
+      <button data-mode="station">Station</button>
+      <button data-mode="pnr">PNR</button>
+    </div>
     <label class="field">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-      <input id="searchInput" list="trainList" placeholder="Enter train number or name — e.g. 12951 or Rajdhani" autocomplete="off">
-      <datalist id="trainList"></datalist>
+      <input id="searchInput" placeholder="Train number or name — e.g. 12951, Rajdhani" autocomplete="off">
     </label>
-    <button class="btn" id="trackBtn">Track train</button>
+    <button class="btn" id="goBtn">Search</button>
   </div>
   <div class="chips" id="chips"></div>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-top">
-      <div>
-        <div class="train-id">
-          <span class="train-no mono" id="hNo">12951</span>
-          <span class="train-name" id="hName">Mumbai Central – New Delhi Rajdhani Express</span>
+  <div class="notice" id="notice"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="dash">Live status</button>
+    <button class="tab" data-view="map">Map</button>
+    <button class="tab" data-view="dir">All trains</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dash">
+    <div class="hero">
+      <svg class="corner tl" aria-hidden="true"><use href="#mandala"/></svg>
+      <svg class="corner br" aria-hidden="true"><use href="#mandala"/></svg>
+      <div class="hero-top">
+        <div>
+          <div class="train-id">
+            <span class="train-no" id="hNo">12951</span>
+            <span class="train-name" id="hName">Mumbai Central – New Delhi Rajdhani Express</span>
+          </div>
+          <div class="route-line" id="hRoute"></div>
         </div>
-        <div class="route-line" id="hRoute">MMCT Mumbai Central → NDLS New Delhi · 1,384 km · Daily</div>
+        <div class="status-badge" id="hStatus"><span class="dot"></span><span>—</span></div>
       </div>
-      <div class="status-badge" id="hStatus"><span class="dot"></span><span>Running 18 min late</span></div>
+      <div class="hero-kpis">
+        <div class="hero-kpi"><div class="k">Current speed</div><div class="v" id="kSpeed">—</div></div>
+        <div class="hero-kpi"><div class="k">Last reported</div><div class="v" id="kLast">—</div></div>
+        <div class="hero-kpi"><div class="k">Next halt</div><div class="v" id="kNext">—</div></div>
+        <div class="hero-kpi"><div class="k">Reaches at</div><div class="v" id="kEta">—</div></div>
+      </div>
+      <div class="progwrap">
+        <div class="progtrack"><div class="progfill" id="progFill"></div></div>
+        <div class="progmeta"><span id="progDone">0 km covered</span><span id="progSim">—</span><span id="progLeft">0 km to go</span></div>
+      </div>
     </div>
 
-    <div class="hero-kpis">
-      <div class="hero-kpi"><div class="k">Current speed</div><div class="v" id="kSpeed">112<small>km/h</small></div></div>
-      <div class="hero-kpi"><div class="k">Last reported</div><div class="v" id="kLast">—</div></div>
-      <div class="hero-kpi"><div class="k">Next halt</div><div class="v" id="kNext">—</div></div>
-      <div class="hero-kpi"><div class="k">Reaches at</div><div class="v" id="kEta">—</div></div>
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Route &amp; live position</div><span class="hint">Schematic</span></div>
+        <div class="routebox"><svg id="routeSvg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Route schematic with live train position"></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Station timetable</div><span class="hint" id="stnHint">—</span></div>
+        <div class="stn-scroll">
+          <table class="stn">
+            <thead><tr><th style="width:74px">Code</th><th>Station</th><th style="width:66px">Arr</th><th style="width:66px">Dep</th><th style="width:52px">Plat</th><th style="width:80px">Status</th></tr></thead>
+            <tbody id="stnBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <div class="progwrap">
-      <div class="progtrack"><div class="progfill" id="progFill"></div></div>
-      <div class="progmeta">
-        <span id="progDone">0 km covered</span>
-        <span id="progSim">Sim clock 17:00 IST</span>
-        <span id="progLeft">0 km to go</span>
+    <div class="controls">
+      <button class="ctrl-btn" id="playBtn"><span id="playLabel">Pause</span></button>
+      <span class="lbl">Speed</span>
+      <div class="rate-group" id="rateGroup">
+        <button data-rate="1">1×</button><button data-rate="4" class="active">4×</button>
+        <button data-rate="12">12×</button><button data-rate="30">30×</button>
       </div>
+      <div class="scrub"><span class="lbl">Scrub</span><input type="range" id="scrub" min="0" max="1000" value="0"></div>
     </div>
   </div>
 
-  <!-- Panels -->
-  <div class="cols">
+  <!-- MAP -->
+  <div class="view" id="view-map">
     <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title"><span class="sec-dot"></span>Route &amp; live position</div>
-        <span class="hint">Schematic</span>
-      </div>
-      <div class="routebox"><svg id="routeSvg" viewBox="0 0 380 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Route schematic with live train position"></svg></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title"><span class="sec-dot"></span>Station timetable</div>
-        <span class="hint" id="stnHint">7 stops</span>
-      </div>
-      <div class="stn-scroll">
-        <table class="stn">
-          <thead>
-            <tr><th style="width:74px">Code</th><th>Station</th><th style="width:66px">Arr</th><th style="width:66px">Dep</th><th style="width:52px">Plat</th><th style="width:78px">Status</th></tr>
-          </thead>
-          <tbody id="stnBody"></tbody>
-        </table>
-      </div>
+      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Live route map</div><span class="hint" id="mapHint">—</span></div>
+      <div id="map"></div>
+      <div class="map-note" id="mapNote">The moving marker shows the train's position along its route. Basemap © OpenStreetMap contributors.</div>
     </div>
   </div>
 
-  <!-- Controls -->
-  <div class="controls">
-    <button class="ctrl-btn" id="playBtn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
-      <span id="playLabel">Pause</span>
-    </button>
-    <span class="lbl">Speed</span>
-    <div class="rate-group" id="rateGroup">
-      <button data-rate="1">1×</button>
-      <button data-rate="4" class="active">4×</button>
-      <button data-rate="12">12×</button>
-      <button data-rate="30">30×</button>
+  <!-- DIRECTORY -->
+  <div class="view" id="view-dir">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Train directory</div><span class="hint" id="dirHint">—</span></div>
+      <div class="dir" id="dirList"></div>
     </div>
-    <div class="scrub">
-      <span class="lbl">Scrub</span>
-      <input type="range" id="scrub" min="0" max="1000" value="0">
+  </div>
+
+  <!-- SEARCH RESULT PANEL (station / pnr) -->
+  <div class="view" id="view-result">
+    <div class="panel"><div class="result" id="resultBody"></div></div>
+  </div>
+
+  <!-- settings -->
+  <div class="drawer" id="settingsDrawer">
+    <h3>Live data settings</h3>
+    <p>The page ships with a <b>demo feed</b> (representative sample data). To use real live status, paste a
+       <b>RapidAPI key</b> for an Indian Railways live-status API below. It is stored only in this browser
+       (localStorage) and is never written into the page source.</p>
+    <label for="apiHost">RapidAPI host</label>
+    <input id="apiHost" placeholder="indian-railway-irctc.p.rapidapi.com">
+    <label for="apiKey">RapidAPI key (x-rapidapi-key)</label>
+    <input id="apiKey" type="password" placeholder="paste your key">
+    <label for="apiPath">Status endpoint path</label>
+    <input id="apiPath" placeholder="/api/trains/v1/train/status">
+    <div class="row">
+      <button class="ctrl-btn" id="saveKeyBtn">Save &amp; go live</button>
+      <button class="ctrl-btn" id="clearKeyBtn">Clear (back to demo)</button>
+      <span class="tiny" id="keyState"></span>
     </div>
+    <p class="tiny" style="margin-top:12px">Calls are made directly from your browser to the API host (RapidAPI endpoints send CORS headers). If a request fails, the page falls back to the demo feed automatically.</p>
   </div>
 
   <div class="foot">
-    <b>About this demo.</b> RailLive is a front-end prototype of a live train-location tracker. The trains, station sequences and timings shown are <b>representative sample data</b> built into the page — this build is not connected to Indian Railways' official NTES feed, so treat positions and delays as illustrative, not authoritative. For a production tracker you'd point the page at a backend endpoint that proxies a licensed live-status API (NTES / a rail-data provider) and returns the same JSON shape this demo uses; the rendering layer needs no changes. Open the file directly in any browser — it is fully self-contained.
+    <b>About.</b> रेललाइव / RailLive is a single-file static web app for Indian Railways live train location. By default it
+    renders a <b>demo feed</b> of representative timetables — positions and delays are illustrative, not official.
+    Add a live-status API key in <b>Live data settings</b> to pull real running status; the page then calls the provider
+    directly from your browser. Always cross-check against the official NTES / enquiry.indianrail.gov.in before travel.
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ============================================================
-   Sample data — representative timetables (illustrative only)
-   ============================================================ */
+/* ============================ data ============================ */
 const TRAINS = {
-  "12951": {
-    number:"12951", name:"Mumbai Central – New Delhi Rajdhani Express",
-    from:"Mumbai Central", to:"New Delhi", days:"Daily", delay:18,
-    stations:[
-      {code:"MMCT",name:"Mumbai Central",dist:0,   sched:"17:00",dep:"17:00",plat:"5", halt:"—"},
-      {code:"BVI", name:"Borivali",      dist:30,  sched:"17:22",dep:"17:24",plat:"4", halt:"2 min"},
-      {code:"ST",  name:"Surat",         dist:263, sched:"20:33",dep:"20:38",plat:"3", halt:"5 min"},
-      {code:"BRC", name:"Vadodara Jn",   dist:392, sched:"22:15",dep:"22:25",plat:"2", halt:"10 min"},
-      {code:"RTM", name:"Ratlam Jn",     dist:654, sched:"01:10",dep:"01:15",plat:"1", halt:"5 min"},
-      {code:"KOTA",name:"Kota Jn",       dist:938, sched:"04:25",dep:"04:30",plat:"2", halt:"5 min"},
-      {code:"NDLS",name:"New Delhi",     dist:1384,sched:"08:35",dep:"—",    plat:"16",halt:"—"}
-    ]
-  },
-  "12002": {
-    number:"12002", name:"New Delhi – Rani Kamlapati Shatabdi Express",
-    from:"New Delhi", to:"Rani Kamlapati", days:"Daily (ex Sun)", delay:4,
-    stations:[
-      {code:"NDLS",name:"New Delhi",         dist:0,   sched:"06:00",dep:"06:00",plat:"1", halt:"—"},
-      {code:"AGC", name:"Agra Cantt",        dist:195, sched:"07:52",dep:"07:54",plat:"1", halt:"2 min"},
-      {code:"GWL", name:"Gwalior Jn",        dist:305, sched:"09:03",dep:"09:05",plat:"1", halt:"2 min"},
-      {code:"JHS", name:"Jhansi Jn",         dist:403, sched:"10:18",dep:"10:20",plat:"1", halt:"2 min"},
-      {code:"BPL", name:"Bhopal Jn",         dist:702, sched:"13:35",dep:"13:40",plat:"1", halt:"5 min"},
-      {code:"RKMP",name:"Rani Kamlapati",    dist:707, sched:"14:00",dep:"—",    plat:"3", halt:"—"}
-    ]
-  },
-  "12621": {
-    number:"12621", name:"Tamil Nadu Express (Chennai – New Delhi)",
-    from:"Chennai Central", to:"New Delhi", days:"Daily", delay:27,
-    stations:[
-      {code:"MAS", name:"Chennai Central", dist:0,   sched:"22:00",dep:"22:00",plat:"9",  halt:"—"},
-      {code:"BZA", name:"Vijayawada Jn",   dist:431, sched:"04:05",dep:"04:15",plat:"8",  halt:"10 min"},
-      {code:"WL",  name:"Warangal",        dist:639, sched:"06:30",dep:"06:32",plat:"2",  halt:"2 min"},
-      {code:"BPQ", name:"Balharshah Jn",   dist:882, sched:"09:20",dep:"09:25",plat:"2",  halt:"5 min"},
-      {code:"NGP", name:"Nagpur Jn",       dist:1093,sched:"12:05",dep:"12:15",plat:"1",  halt:"10 min"},
-      {code:"BPL", name:"Bhopal Jn",       dist:1483,sched:"17:35",dep:"17:45",plat:"1",  halt:"10 min"},
-      {code:"JHS", name:"Jhansi Jn",       dist:1782,sched:"21:30",dep:"21:40",plat:"1",  halt:"10 min"},
-      {code:"AGC", name:"Agra Cantt",      dist:1990,sched:"00:25",dep:"00:27",plat:"1",  halt:"2 min"},
-      {code:"NDLS",name:"New Delhi",       dist:2185,sched:"04:30",dep:"—",    plat:"12", halt:"—"}
-    ]
-  },
-  "12301": {
-    number:"12301", name:"Howrah – New Delhi Rajdhani Express",
-    from:"Howrah", to:"New Delhi", days:"Daily", delay:0,
-    stations:[
-      {code:"HWH", name:"Howrah Jn",       dist:0,   sched:"16:50",dep:"16:50",plat:"9", halt:"—"},
-      {code:"DHN", name:"Dhanbad Jn",      dist:259, sched:"20:12",dep:"20:17",plat:"2", halt:"5 min"},
-      {code:"GAYA",name:"Gaya Jn",         dist:449, sched:"22:05",dep:"22:10",plat:"1", halt:"5 min"},
-      {code:"DDU", name:"Pt. D. D. Upadhyaya Jn", dist:664, sched:"00:40",dep:"00:50",plat:"4", halt:"10 min"},
-      {code:"PRYJ",name:"Prayagraj Jn",    dist:814, sched:"02:40",dep:"02:45",plat:"5", halt:"5 min"},
-      {code:"CNB", name:"Kanpur Central",  dist:1004,sched:"05:10",dep:"05:15",plat:"1", halt:"5 min"},
-      {code:"NDLS",name:"New Delhi",       dist:1445,sched:"10:00",dep:"—",    plat:"16",halt:"—"}
-    ]
-  },
-  "20901": {
-    number:"20901", name:"Mumbai Central – Gandhinagar Vande Bharat Express",
-    from:"Mumbai Central", to:"Gandhinagar", days:"Daily (ex Sun)", delay:9,
-    stations:[
-      {code:"MMCT",name:"Mumbai Central",  dist:0,   sched:"06:10",dep:"06:10",plat:"2", halt:"—"},
-      {code:"ST",  name:"Surat",           dist:263, sched:"08:35",dep:"08:38",plat:"1", halt:"3 min"},
-      {code:"BRC", name:"Vadodara Jn",     dist:392, sched:"09:48",dep:"09:51",plat:"2", halt:"3 min"},
-      {code:"ADI", name:"Ahmedabad Jn",    dist:491, sched:"11:35",dep:"11:40",plat:"5", halt:"5 min"},
-      {code:"GNC", name:"Gandhinagar Capital",dist:530,sched:"12:25",dep:"—",  plat:"1", halt:"—"}
-    ]
-  }
+  "12951": {number:"12951",name:"Mumbai Central – New Delhi Rajdhani Express",from:"Mumbai Central",to:"New Delhi",days:"Daily",delay:18,stations:[
+    {code:"MMCT",name:"Mumbai Central",dist:0,sched:"17:00",dep:"17:00",plat:"5",halt:"—",lat:18.9712,lng:72.8194},
+    {code:"BVI",name:"Borivali",dist:30,sched:"17:22",dep:"17:24",plat:"4",halt:"2 min",lat:19.2307,lng:72.8567},
+    {code:"ST",name:"Surat",dist:263,sched:"20:33",dep:"20:38",plat:"3",halt:"5 min",lat:21.2049,lng:72.8411},
+    {code:"BRC",name:"Vadodara Jn",dist:392,sched:"22:15",dep:"22:25",plat:"2",halt:"10 min",lat:22.3072,lng:73.1812},
+    {code:"RTM",name:"Ratlam Jn",dist:654,sched:"01:10",dep:"01:15",plat:"1",halt:"5 min",lat:23.3315,lng:75.0367},
+    {code:"KOTA",name:"Kota Jn",dist:938,sched:"04:25",dep:"04:30",plat:"2",halt:"5 min",lat:25.1802,lng:75.8391},
+    {code:"NDLS",name:"New Delhi",dist:1384,sched:"08:35",dep:"—",plat:"16",halt:"—",lat:28.6426,lng:77.2197}]},
+  "12002": {number:"12002",name:"New Delhi – Rani Kamlapati Shatabdi Express",from:"New Delhi",to:"Rani Kamlapati",days:"Daily (ex Sun)",delay:4,stations:[
+    {code:"NDLS",name:"New Delhi",dist:0,sched:"06:00",dep:"06:00",plat:"1",halt:"—",lat:28.6426,lng:77.2197},
+    {code:"AGC",name:"Agra Cantt",dist:195,sched:"07:52",dep:"07:54",plat:"1",halt:"2 min",lat:27.1553,lng:78.0081},
+    {code:"GWL",name:"Gwalior Jn",dist:305,sched:"09:03",dep:"09:05",plat:"1",halt:"2 min",lat:26.2183,lng:78.1828},
+    {code:"JHS",name:"Jhansi Jn",dist:403,sched:"10:18",dep:"10:20",plat:"1",halt:"2 min",lat:25.4484,lng:78.5685},
+    {code:"BPL",name:"Bhopal Jn",dist:702,sched:"13:35",dep:"13:40",plat:"1",halt:"5 min",lat:23.2599,lng:77.4126},
+    {code:"RKMP",name:"Rani Kamlapati",dist:707,sched:"14:00",dep:"—",plat:"3",halt:"—",lat:23.2194,lng:77.4344}]},
+  "12621": {number:"12621",name:"Tamil Nadu Express (Chennai – New Delhi)",from:"Chennai Central",to:"New Delhi",days:"Daily",delay:27,stations:[
+    {code:"MAS",name:"Chennai Central",dist:0,sched:"22:00",dep:"22:00",plat:"9",halt:"—",lat:13.0827,lng:80.2755},
+    {code:"BZA",name:"Vijayawada Jn",dist:431,sched:"04:05",dep:"04:15",plat:"8",halt:"10 min",lat:16.5062,lng:80.6480},
+    {code:"WL",name:"Warangal",dist:639,sched:"06:30",dep:"06:32",plat:"2",halt:"2 min",lat:17.9689,lng:79.5941},
+    {code:"BPQ",name:"Balharshah Jn",dist:882,sched:"09:20",dep:"09:25",plat:"2",halt:"5 min",lat:19.8333,lng:79.3500},
+    {code:"NGP",name:"Nagpur Jn",dist:1093,sched:"12:05",dep:"12:15",plat:"1",halt:"10 min",lat:21.1458,lng:79.0882},
+    {code:"BPL",name:"Bhopal Jn",dist:1483,sched:"17:35",dep:"17:45",plat:"1",halt:"10 min",lat:23.2599,lng:77.4126},
+    {code:"JHS",name:"Jhansi Jn",dist:1782,sched:"21:30",dep:"21:40",plat:"1",halt:"10 min",lat:25.4484,lng:78.5685},
+    {code:"AGC",name:"Agra Cantt",dist:1990,sched:"00:25",dep:"00:27",plat:"1",halt:"2 min",lat:27.1553,lng:78.0081},
+    {code:"NDLS",name:"New Delhi",dist:2185,sched:"04:30",dep:"—",plat:"12",halt:"—",lat:28.6426,lng:77.2197}]},
+  "12301": {number:"12301",name:"Howrah – New Delhi Rajdhani Express",from:"Howrah",to:"New Delhi",days:"Daily",delay:0,stations:[
+    {code:"HWH",name:"Howrah Jn",dist:0,sched:"16:50",dep:"16:50",plat:"9",halt:"—",lat:22.5851,lng:88.3467},
+    {code:"DHN",name:"Dhanbad Jn",dist:259,sched:"20:12",dep:"20:17",plat:"2",halt:"5 min",lat:23.7957,lng:86.4304},
+    {code:"GAYA",name:"Gaya Jn",dist:449,sched:"22:05",dep:"22:10",plat:"1",halt:"5 min",lat:24.7955,lng:85.0002},
+    {code:"DDU",name:"Pt. D. D. Upadhyaya Jn",dist:664,sched:"00:40",dep:"00:50",plat:"4",halt:"10 min",lat:25.2759,lng:83.1197},
+    {code:"PRYJ",name:"Prayagraj Jn",dist:814,sched:"02:40",dep:"02:45",plat:"5",halt:"5 min",lat:25.4358,lng:81.8463},
+    {code:"CNB",name:"Kanpur Central",dist:1004,sched:"05:10",dep:"05:15",plat:"1",halt:"5 min",lat:26.4499,lng:80.3319},
+    {code:"NDLS",name:"New Delhi",dist:1445,sched:"10:00",dep:"—",plat:"16",halt:"—",lat:28.6426,lng:77.2197}]},
+  "20901": {number:"20901",name:"Mumbai Central – Gandhinagar Vande Bharat Express",from:"Mumbai Central",to:"Gandhinagar",days:"Daily (ex Sun)",delay:9,stations:[
+    {code:"MMCT",name:"Mumbai Central",dist:0,sched:"06:10",dep:"06:10",plat:"2",halt:"—",lat:18.9712,lng:72.8194},
+    {code:"ST",name:"Surat",dist:263,sched:"08:35",dep:"08:38",plat:"1",halt:"3 min",lat:21.2049,lng:72.8411},
+    {code:"BRC",name:"Vadodara Jn",dist:392,sched:"09:48",dep:"09:51",plat:"2",halt:"3 min",lat:22.3072,lng:73.1812},
+    {code:"ADI",name:"Ahmedabad Jn",dist:491,sched:"11:35",dep:"11:40",plat:"5",halt:"5 min",lat:23.0225,lng:72.5714},
+    {code:"GNC",name:"Gandhinagar Capital",dist:530,sched:"12:25",dep:"—",plat:"1",halt:"—",lat:23.2156,lng:72.6369}]},
+  "12051": {number:"12051",name:"Mumbai CSMT – Madgaon Jan Shatabdi Express",from:"Mumbai CSMT",to:"Madgaon",days:"Daily",delay:12,stations:[
+    {code:"CSMT",name:"Mumbai CSMT",dist:0,sched:"05:10",dep:"05:10",plat:"18",halt:"—",lat:18.9400,lng:72.8353},
+    {code:"DR",name:"Dadar",dist:9,sched:"05:19",dep:"05:21",plat:"5",halt:"2 min",lat:19.0186,lng:72.8443},
+    {code:"TNA",name:"Thane",dist:34,sched:"05:42",dep:"05:44",plat:"5",halt:"2 min",lat:19.1860,lng:72.9750},
+    {code:"PNVL",name:"Panvel",dist:55,sched:"06:05",dep:"06:07",plat:"3",halt:"2 min",lat:18.9894,lng:73.1175},
+    {code:"RN",name:"Ratnagiri",dist:331,sched:"10:30",dep:"10:40",plat:"1",halt:"10 min",lat:16.9902,lng:73.3120},
+    {code:"KRMI",name:"Karmali",dist:498,sched:"13:05",dep:"13:07",plat:"1",halt:"2 min",lat:15.5439,lng:73.8700},
+    {code:"MAO",name:"Madgaon Jn",dist:590,sched:"14:25",dep:"—",plat:"2",halt:"—",lat:15.2760,lng:73.9720}]},
+  "12627": {number:"12627",name:"Karnataka Express (Bengaluru – New Delhi)",from:"KSR Bengaluru",to:"New Delhi",days:"Daily",delay:35,stations:[
+    {code:"SBC",name:"KSR Bengaluru",dist:0,sched:"19:20",dep:"19:20",plat:"1",halt:"—",lat:12.9784,lng:77.5726},
+    {code:"GTL",name:"Guntakal Jn",dist:293,sched:"23:55",dep:"00:05",plat:"1",halt:"10 min",lat:15.1670,lng:77.3700},
+    {code:"SC",name:"Secunderabad Jn",dist:610,sched:"04:05",dep:"04:15",plat:"1",halt:"10 min",lat:17.4399,lng:78.4983},
+    {code:"KZJ",name:"Kazipet Jn",dist:749,sched:"06:15",dep:"06:17",plat:"1",halt:"2 min",lat:17.9970,lng:79.5000},
+    {code:"BPQ",name:"Balharshah Jn",dist:955,sched:"09:20",dep:"09:30",plat:"1",halt:"10 min",lat:19.8333,lng:79.3500},
+    {code:"NGP",name:"Nagpur Jn",dist:1166,sched:"12:20",dep:"12:30",plat:"1",halt:"10 min",lat:21.1458,lng:79.0882},
+    {code:"BPL",name:"Bhopal Jn",dist:1556,sched:"18:20",dep:"18:30",plat:"1",halt:"10 min",lat:23.2599,lng:77.4126},
+    {code:"JHS",name:"Jhansi Jn",dist:1855,sched:"22:40",dep:"22:50",plat:"1",halt:"10 min",lat:25.4484,lng:78.5685},
+    {code:"AGC",name:"Agra Cantt",dist:2063,sched:"01:40",dep:"01:42",plat:"1",halt:"2 min",lat:27.1553,lng:78.0081},
+    {code:"NDLS",name:"New Delhi",dist:2258,sched:"05:30",dep:"—",plat:"9",halt:"—",lat:28.6426,lng:77.2197}]},
+  "12841": {number:"12841",name:"Coromandel Express (Shalimar – Chennai)",from:"Shalimar",to:"MGR Chennai Central",days:"Daily",delay:6,stations:[
+    {code:"SHM",name:"Shalimar",dist:0,sched:"14:50",dep:"14:50",plat:"1",halt:"—",lat:22.5560,lng:88.3130},
+    {code:"KGP",name:"Kharagpur Jn",dist:116,sched:"16:50",dep:"17:00",plat:"1",halt:"10 min",lat:22.3460,lng:87.2320},
+    {code:"BBS",name:"Bhubaneswar",dist:437,sched:"21:30",dep:"21:40",plat:"2",halt:"10 min",lat:20.2961,lng:85.8245},
+    {code:"VSKP",name:"Visakhapatnam",dist:878,sched:"02:50",dep:"03:10",plat:"1",halt:"20 min",lat:17.6868,lng:83.2185},
+    {code:"BZA",name:"Vijayawada Jn",dist:1229,sched:"09:00",dep:"09:10",plat:"8",halt:"10 min",lat:16.5062,lng:80.6480},
+    {code:"MAS",name:"MGR Chennai Central",dist:1661,sched:"15:40",dep:"—",plat:"5",halt:"—",lat:13.0827,lng:80.2755}]},
+  "12009": {number:"12009",name:"Mumbai – Ahmedabad Shatabdi Express",from:"Mumbai Central",to:"Ahmedabad",days:"Daily (ex Sun)",delay:3,stations:[
+    {code:"MMCT",name:"Mumbai Central",dist:0,sched:"06:25",dep:"06:25",plat:"2",halt:"—",lat:18.9712,lng:72.8194},
+    {code:"ST",name:"Surat",dist:263,sched:"09:05",dep:"09:08",plat:"1",halt:"3 min",lat:21.2049,lng:72.8411},
+    {code:"BRC",name:"Vadodara Jn",dist:392,sched:"10:18",dep:"10:21",plat:"2",halt:"3 min",lat:22.3072,lng:73.1812},
+    {code:"ANND",name:"Anand Jn",dist:471,sched:"11:06",dep:"11:08",plat:"1",halt:"2 min",lat:22.5645,lng:72.9289},
+    {code:"ND",name:"Nadiad Jn",dist:493,sched:"11:24",dep:"11:26",plat:"1",halt:"2 min",lat:22.6939,lng:72.8616},
+    {code:"ADI",name:"Ahmedabad Jn",dist:543,sched:"12:25",dep:"—",plat:"5",halt:"—",lat:23.0225,lng:72.5714}]}
 };
 
-/* ---------- helpers ---------- */
+/* ============================ helpers ============================ */
 const $ = id => document.getElementById(id);
 const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
-const fmtMin = m => { m=((m%1440)+1440)%1440; const h=Math.floor(m/60), mm=Math.round(m%60); return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0"); };
-const pad = n => String(n).padStart(2,"0");
-
+const fmtMin = m => { m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(Math.round(m%60)).padStart(2,"0"); };
 function prep(t){
-  const st = t.stations;
+  const st=t.stations;
   st.forEach((s,i)=>{
-    let m = toMin(s.sched);
-    if(i>0 && m < st[i-1].schedMin) m += 1440;   // cross midnight
-    s.schedMin = m;
-    s.depMin = s.dep==="—" ? m : (toMin(s.dep) < toMin(s.sched) ? toMin(s.dep)+1440 : toMin(s.dep));
-    if(i>0 && s.depMin < st[i-1].schedMin) s.depMin += 1440;
+    let m=toMin(s.sched); if(i>0 && m<st[i-1].schedMin) m+=1440; s.schedMin=m;
+    let d = s.dep==="—" ? m : toMin(s.dep); if(i>0 && d<st[i-1].schedMin) d+=1440; if(i>0 && d<m) d+=1440; s.depMin=d;
   });
-  t.total = st[st.length-1].dist;
-  t.startMin = st[0].depMin;
-  t.endMin = st[st.length-1].schedMin;
-  t.dur = t.endMin - t.startMin;
+  t.total=st[st.length-1].dist; t.startMin=st[0].depMin; t.endMin=st[st.length-1].schedMin; t.dur=Math.max(1,t.endMin-t.startMin);
   return t;
 }
 Object.values(TRAINS).forEach(prep);
+const stationIndex = {};
+Object.values(TRAINS).forEach(t=>t.stations.forEach(s=>{ (stationIndex[s.code]=stationIndex[s.code]||{code:s.code,name:s.name,trains:[]}).trains.push(t); }));
 
-/* ---------- state ---------- */
+/* ============================ state ============================ */
 let cur = TRAINS["12951"];
-let progress = 0.42;      // 0..1 of total distance
-let playing = true;
-let rate = 4;             // simulated minutes per real second factor
-let lastTs = 0;
+let progress = 0.4, playing = true, rate = 4, lastTs = 0, searchMode = "train";
+const simMinPerSec = () => rate * 0.6;
 
-const simMinutesPerSecond = () => rate * 0.6;
+/* live config */
+let live = { host:"", key:"", path:"", enabled:false };
+try{ const s=JSON.parse(localStorage.getItem("raillive.live")||"{}"); if(s&&s.key){ live={host:s.host||"indian-railway-irctc.p.rapidapi.com",key:s.key,path:s.path||"/api/trains/v1/train/status",enabled:true}; } }catch(e){}
 
-/* ---------- position maths ---------- */
+/* ============================ position ============================ */
 function position(){
-  const st = cur.stations;
-  const km = progress * cur.total;
-  let i = 0;
-  for(let k=0;k<st.length-1;k++){ if(km >= st[k].dist && km <= st[k+1].dist){ i=k; break; } i=k; }
-  const a = st[i], b = st[Math.min(i+1, st.length-1)];
-  const segLen = Math.max(1, b.dist - a.dist);
-  const frac = Math.min(1, Math.max(0, (km - a.dist)/segLen));
-  const segMin = Math.max(1, b.schedMin - a.depMin);
-  const baseSpeed = (segLen / (segMin/60));
-  const speed = Math.max(0, Math.min(160, Math.round(baseSpeed * (0.94 + 0.12*Math.sin(km*0.05)))));
-  return {km, i, a, b, frac, speed};
+  const st=cur.stations, km=progress*cur.total;
+  let i=0; for(let k=0;k<st.length-1;k++){ if(km>=st[k].dist && km<=st[k+1].dist){i=k;break;} i=k; }
+  const a=st[i], b=st[Math.min(i+1,st.length-1)];
+  const segLen=Math.max(1,b.dist-a.dist), frac=Math.min(1,Math.max(0,(km-a.dist)/segLen));
+  const segMin=Math.max(1,b.schedMin-a.depMin), base=(segLen/(segMin/60));
+  const speed=Math.max(0,Math.min(165,Math.round(base*(0.94+0.12*Math.sin(km*0.05)))));
+  const lat=a.lat+(b.lat-a.lat)*frac, lng=a.lng+(b.lng-a.lng)*frac;
+  return {km,i,a,b,frac,speed,lat,lng};
 }
 
-/* ---------- render ---------- */
+/* ============================ render ============================ */
 function render(){
-  const st = cur.stations;
-  const {km,i,a,b,frac,speed} = position();
-  const simMin = cur.startMin + (km / cur.total) * cur.dur;
-  const delay = cur.delay;
+  const st=cur.stations, p=position(), delay=cur.delay;
+  const simMin=cur.startMin+(p.km/cur.total)*cur.dur;
 
-  // hero text
-  $("hNo").textContent = cur.number;
-  $("hName").textContent = cur.name;
-  $("hRoute").textContent = `${st[0].code} ${cur.from} → ${st[st.length-1].code} ${cur.to} · ${cur.total.toLocaleString("en-IN")} km · ${cur.days}`;
+  $("hNo").textContent=cur.number;
+  $("hName").textContent=cur.name;
+  $("hRoute").textContent=`${st[0].code} ${cur.from} → ${st[st.length-1].code} ${cur.to} · ${cur.total.toLocaleString("en-IN")} km · ${cur.days}`;
 
-  const badge = $("hStatus");
+  const badge=$("hStatus");
   if(delay<=3){ badge.className="status-badge on-time"; badge.innerHTML='<span class="dot"></span><span>On time</span>'; }
   else if(delay<=25){ badge.className="status-badge"; badge.innerHTML='<span class="dot"></span><span>Running '+delay+' min late</span>'; }
   else { badge.className="status-badge late"; badge.innerHTML='<span class="dot"></span><span>Running '+delay+' min late</span>'; }
 
-  const running = km < cur.total - 0.5 && km > 0.5;
-  $("kSpeed").innerHTML = (running? speed : 0)+'<small>km/h</small>';
-  $("kLast").textContent = km>=st[st.length-1].dist-0.5 ? st[st.length-1].code : a.code;
-  $("kNext").textContent = (i+1<st.length) ? st[i+1].code : "—";
-  $("kEta").textContent = (i+1<st.length) ? fmtMin(st[i+1].schedMin + delay) : fmtMin(st[st.length-1].schedMin + delay);
+  const running = p.km>0.5 && p.km<cur.total-0.5;
+  $("kSpeed").innerHTML=(running?p.speed:0)+'<small>km/h</small>';
+  $("kLast").textContent = p.km>=cur.total-0.5 ? st[st.length-1].code : p.a.code;
+  $("kNext").textContent = (p.i+1<st.length)?st[p.i+1].code:"—";
+  $("kEta").textContent = (p.i+1<st.length)?fmtMin(st[p.i+1].schedMin+delay):fmtMin(st[st.length-1].schedMin+delay);
 
-  // progress
-  $("progFill").style.width = (progress*100).toFixed(1)+"%";
-  $("progDone").textContent = Math.round(km).toLocaleString("en-IN")+" km covered";
-  $("progLeft").textContent = Math.max(0, Math.round(cur.total-km)).toLocaleString("en-IN")+" km to go";
-  $("progSim").textContent = "Sim clock "+fmtMin(simMin)+" IST";
-  $("scrub").value = Math.round(progress*1000);
+  $("progFill").style.width=(progress*100).toFixed(1)+"%";
+  $("progDone").textContent=Math.round(p.km).toLocaleString("en-IN")+" km covered";
+  $("progLeft").textContent=Math.max(0,Math.round(cur.total-p.km)).toLocaleString("en-IN")+" km to go";
+  $("progSim").textContent=(live.enabled?"LIVE · ":"Sim clock ")+fmtMin(simMin)+" IST";
+  $("scrub").value=Math.round(progress*1000);
+  $("stnHint").textContent=st.length+" stops";
+  $("mapHint").textContent=cur.number+" · "+cur.from+" → "+cur.to;
 
-  drawRoute(km, i, frac);
-  drawTable(i, km, delay);
+  drawRoute(p.km,p.i,p.frac);
+  drawTable(p.i,p.km,delay);
+  updateMap(p);
 }
 
-function drawRoute(km, idx, frac){
-  const svg = $("routeSvg");
-  const st = cur.stations;
-  const W = 400, top = 34, bot = 34, H = 500;
-  const usable = H - top - bot;
-  const y = d => top + (d/cur.total)*usable;
-  const spineX = 104;
-
-  let s = "";
-  // spine
-  s += `<line x1="${spineX}" y1="${y(0)}" x2="${spineX}" y2="${y(cur.total)}" stroke="var(--track)" stroke-width="3" stroke-linecap="round"/>`;
-  // completed portion
-  s += `<line x1="${spineX}" y1="${y(0)}" x2="${spineX}" y2="${y(km)}" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>`;
-
-  st.forEach((n, k) => {
-    const cy = y(n.dist);
-    const passed = k < idx || (k===idx && frac>0);
-    const isCur = k===idx;
-    const fill = isCur ? "var(--gold)" : passed ? "var(--gold)" : "var(--surface)";
-    const stroke = passed ? "var(--gold)" : "var(--track)";
-    s += `<circle cx="${spineX}" cy="${cy.toFixed(1)}" r="${isCur?7:5}" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/>`;
-    // code + name
-    s += `<text x="${spineX+18}" y="${(cy-3).toFixed(1)}" font-family="var(--font-mono)" font-size="11.5" font-weight="600" fill="${passed?'var(--text)':'var(--text-dim)'}">${n.code}</text>`;
-    s += `<text x="${spineX+18}" y="${(cy+11).toFixed(1)}" font-family="var(--font-body)" font-size="10.5" fill="var(--text-faint)">${n.name.length>22?n.name.slice(0,21)+'…':n.name}</text>`;
-    // time right
-    s += `<text x="${W-8}" y="${(cy+3).toFixed(1)}" text-anchor="end" font-family="var(--font-mono)" font-size="10.5" fill="${passed?'var(--text-dim)':'var(--text-faint)'}">${n.sched}</text>`;
-  });
-
-  // train marker (drawn to the LEFT of the spine so it never overlaps station labels)
-  const ty = y(km);
-  s += `<g transform="translate(${spineX},${ty.toFixed(1)})">
-      <rect x="-30" y="-11" width="24" height="22" rx="6" fill="var(--navy)" stroke="var(--gold-2)" stroke-width="1.6"/>
-      <text x="-18" y="4.5" text-anchor="middle" font-size="13" fill="var(--gold-2)">▸</text>
-    </g>`;
-  s += `<text x="${spineX-38}" y="${(ty+3.5).toFixed(1)}" text-anchor="end" font-family="var(--font-mono)" font-size="9.5" font-weight="600" fill="var(--gold)" letter-spacing="0.08em">LIVE ▸</text>`;
-
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.innerHTML = s;
-}
-
-function drawTable(idx, km, delay){
-  const st = cur.stations;
-  let rows = "";
+function drawRoute(km,idx,frac){
+  const svg=$("routeSvg"), st=cur.stations;
+  const W=400,top=34,bot=34,H=500,usable=H-top-bot,spineX=104;
+  const y=d=>top+(d/cur.total)*usable;
+  let s="";
+  s+=`<line x1="${spineX}" y1="${y(0)}" x2="${spineX}" y2="${y(cur.total)}" stroke="var(--track)" stroke-width="3" stroke-linecap="round"/>`;
+  s+=`<line x1="${spineX}" y1="${y(0)}" x2="${spineX}" y2="${y(km)}" stroke="var(--saffron)" stroke-width="3" stroke-linecap="round"/>`;
   st.forEach((n,k)=>{
-    let cls = "passed", status = '<span class="pill dep">Departed</span>';
-    if(k===idx && km < cur.total-0.5){ cls="current"; status='<span class="pill now">Current</span>'; }
+    const cy=y(n.dist), passed=k<idx||(k===idx&&frac>0), isCur=k===idx;
+    const fill=isCur?"var(--saffron)":passed?"var(--saffron)":"var(--surface)";
+    const stroke=passed?"var(--saffron)":"var(--track)";
+    s+=`<circle cx="${spineX}" cy="${cy.toFixed(1)}" r="${isCur?7:5}" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/>`;
+    s+=`<text x="${spineX+18}" y="${(cy-3).toFixed(1)}" font-family="var(--font-mono)" font-size="11.5" font-weight="600" fill="${passed?'var(--text)':'var(--text-dim)'}">${n.code}</text>`;
+    s+=`<text x="${spineX+18}" y="${(cy+11).toFixed(1)}" font-family="var(--font-body)" font-size="10.5" fill="var(--text-faint)">${n.name.length>22?n.name.slice(0,21)+'…':n.name}</text>`;
+    s+=`<text x="${W-8}" y="${(cy+3).toFixed(1)}" text-anchor="end" font-family="var(--font-mono)" font-size="10.5" fill="${passed?'var(--text-dim)':'var(--text-faint)'}">${n.sched}</text>`;
+  });
+  const ty=y(km);
+  s+=`<g transform="translate(${spineX},${ty.toFixed(1)})"><rect x="-30" y="-11" width="24" height="22" rx="6" fill="var(--maroon)" stroke="var(--gold-2)" stroke-width="1.6"/><text x="-18" y="4.5" text-anchor="middle" font-size="13" fill="var(--gold-2)">▸</text></g>`;
+  s+=`<text x="${spineX-38}" y="${(ty+3.5).toFixed(1)}" text-anchor="end" font-family="var(--font-mono)" font-size="9.5" font-weight="600" fill="var(--saffron)" letter-spacing="0.08em">LIVE ▸</text>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML=s;
+}
+
+function drawTable(idx,km,delay){
+  const st=cur.stations; let rows="";
+  st.forEach((n,k)=>{
+    let cls="passed", status='<span class="pill dep">Departed</span>';
+    if(k===idx && km<cur.total-0.5){ cls="current"; status='<span class="pill now">Current</span>'; }
     if(k===idx+1){ cls=""; status='<span class="pill next">Next halt</span>'; }
     if(k===st.length-1 && km>=cur.total-0.5){ cls=""; status='<span class="pill now">Arrived</span>'; }
     if(k>idx+1){ cls=""; status='<span class="pill dep">Upcoming</span>'; }
     if(k===0 && idx===0 && km<0.5){ cls="current"; status='<span class="pill now">At station</span>'; }
-
-    const showDelay = k>idx && delay>3;
-    const arrT = n.sched==="—" ? "—" : fmtMin(n.schedMin + (k>idx?delay:0));
-    const depT = n.dep==="—" ? "—" : fmtMin(n.depMin + (k>idx?delay:0));
-    rows += `<tr class="${cls}">
-      <td class="code">${n.code}</td>
-      <td class="nm">${n.name}<small>${n.dist.toLocaleString("en-IN")} km · halt ${n.halt}</small></td>
-      <td class="t ${showDelay?'delay':''}">${arrT}${showDelay?'<small style="display:block;font-size:9.5px;opacity:.8">+'+delay+'</small>':''}</td>
-      <td class="t ${showDelay?'delay':''}">${depT}</td>
-      <td class="plat">${n.plat}</td>
-      <td>${status}</td>
-    </tr>`;
+    const showDelay=k>idx && delay>3;
+    const arrT=n.sched==="—"?"—":fmtMin(n.schedMin+(k>idx?delay:0));
+    const depT=n.dep==="—"?"—":fmtMin(n.depMin+(k>idx?delay:0));
+    rows+=`<tr class="${cls}"><td class="code">${n.code}</td><td class="nm">${n.name}<small>${n.dist.toLocaleString("en-IN")} km · halt ${n.halt}</small></td><td class="t ${showDelay?'delay':''}">${arrT}${showDelay?'<small style="display:block;font-size:9.5px;opacity:.8">+'+delay+'</small>':''}</td><td class="t ${showDelay?'delay':''}">${depT}</td><td class="plat">${n.plat}</td><td>${status}</td></tr>`;
   });
-  $("stnBody").innerHTML = rows;
-  $("stnHint").textContent = st.length+" stops";
+  $("stnBody").innerHTML=rows;
 }
 
-/* ---------- loop ---------- */
-function tick(ts){
-  if(!lastTs) lastTs = ts;
-  const dt = Math.min(0.25, (ts-lastTs)/1000);
-  lastTs = ts;
-  if(playing){
-    progress += (simMinutesPerSecond()*dt) / cur.dur;
-    if(progress >= 1){ progress = 1; setPlaying(false); }
-    render();
+/* ============================ map ============================ */
+let map=null, routeLayer=null, trainMarker=null;
+function initMap(){
+  if(map || typeof L==="undefined") return;
+  map=L.map("map",{zoomControl:true,attributionControl:true,scrollWheelZoom:false}).setView([22.5,78.5],5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+}
+function updateMap(p){
+  if(!map) return;
+  if(routeLayer){ map.removeLayer(routeLayer); }
+  if(trainMarker){ map.removeLayer(trainMarker); }
+  routeLayer=L.layerGroup().addTo(map);
+  const pts=cur.stations.map(s=>[s.lat,s.lng]);
+  L.polyline(pts,{color:"#7a1f2b",weight:4,opacity:0.85}).addTo(routeLayer);
+  cur.stations.forEach((s,k)=>{
+    L.circleMarker([s.lat,s.lng],{radius:5,color:"#b07d10",weight:2,fillColor:"#fffdf7",fillOpacity:1})
+      .bindTooltip(s.code+" · "+s.name,{direction:"top"}).addTo(routeLayer);
+  });
+  const icon=L.divIcon({className:"",html:'<div class="train-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="14" rx="3"></rect><path d="M5 10h14"></path><circle cx="8.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle></svg></div>',iconSize:[34,34],iconAnchor:[17,17]});
+  trainMarker=L.marker([p.lat,p.lng],{icon:icon}).addTo(map).bindPopup("<b>"+cur.number+"</b> "+cur.name);
+  map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
+}
+
+/* ============================ tabs ============================ */
+function showView(v){
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+  $("view-"+v).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));
+  if(v==="map"){ initMap(); if(map){ setTimeout(()=>{ map.invalidateSize(); updateMap(position()); },80); } }
+}
+
+/* ============================ directory ============================ */
+function renderDirectory(){
+  $("dirHint").textContent=Object.keys(TRAINS).length+" trains";
+  $("dirList").innerHTML=Object.values(TRAINS).map(t=>{
+    const cls=t.delay<=3?"ok":"late", txt=t.delay<=3?"On time":"+"+t.delay+" min";
+    return `<div class="dir-row" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="dir-name">${t.name}</div><div class="dir-route">${t.stations[0].code} ${t.from} → ${t.stations[t.stations.length-1].code} ${t.to} · ${t.total.toLocaleString("en-IN")} km</div></div><span class="dir-delay ${cls}">${txt}</span></div>`;
+  }).join("");
+  $("dirList").onclick=e=>{ const r=e.target.closest(".dir-row"); if(r){ loadTrain(r.dataset.num); showView("dash"); } };
+}
+
+/* ============================ search ============================ */
+function loadTrain(num){
+  const t=TRAINS[num]; if(!t) return;
+  cur=t; progress=0.35+Math.random()*0.2; lastTs=0; setPlaying(true);
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.dataset.num===num));
+  $("searchInput").value=num;
+  render(); if(map) updateMap(position());
+}
+function doSearch(){
+  const q=$("searchInput").value.trim();
+  if(!q) return;
+  if(searchMode==="pnr"){ renderPNR(q); showView("result"); return; }
+  if(searchMode==="station"){ renderStation(q); showView("result"); return; }
+  const ql=q.toLowerCase();
+  if(TRAINS[q]){ loadTrain(q); showView("dash"); return; }
+  const hit=Object.values(TRAINS).find(t=>t.number.toLowerCase().includes(ql)||t.name.toLowerCase().includes(ql));
+  if(hit){ loadTrain(hit.number); showView("dash"); return; }
+  if(live.enabled){ fetchLive(q); return; }
+  notice("No train matched “"+q+"” in the demo set. Try 12951, 12002, 12621, 12301, 20901, 12051, 12627, 12841 or 12009.");
+}
+function renderStation(q){
+  const ql=q.toLowerCase();
+  const codes=Object.values(stationIndex).filter(s=>s.code.toLowerCase()===ql||s.name.toLowerCase().includes(ql)||s.code.toLowerCase().includes(ql));
+  if(!codes.length){ $("resultBody").innerHTML=`<h3>No station found</h3><div class="sub">Try a station name or code — e.g. NDLS, New Delhi, Surat, Bhopal.</div>`; return; }
+  let html=`<h3>${codes[0].name}</h3><div class="sub">${codes[0].code} · trains passing through</div>`;
+  codes[0].trains.forEach(t=>{
+    html+=`<div class="hit" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="hit-name">${t.name}</div><div class="dir-route">${t.from} → ${t.to}</div></div></div>`;
+  });
+  $("resultBody").innerHTML=html;
+  $("resultBody").querySelectorAll(".hit").forEach(h=>h.onclick=()=>{ loadTrain(h.dataset.num); showView("dash"); });
+}
+function renderPNR(pnr){
+  const digits=(pnr.match(/\d/g)||[]).join("");
+  if(digits.length<10){ $("resultBody").innerHTML=`<h3>Enter a 10-digit PNR</h3><div class="sub">A PNR is printed on your ticket — e.g. 4512345678.</div>`; return; }
+  // deterministic sample (demo feed)
+  const names=["A. Sharma","R. Iyer","S. Khan","P. Nair","M. Verma","D. Bose"];
+  const seed=digits.split("").reduce((a,c)=>a+Number(c),0);
+  const coaches=["B2","S4","A1","B1","S2"];
+  const seat=["32 (LB)","58 (UB)","21 (MB)","44 (SL)","17 (LB)"];
+  let html=`<h3>PNR ${digits}</h3><div class="sub">${live.enabled?"Provider key set — but PNR needs a PNR endpoint; showing demo":"Demo feed · representative sample"}</div>`;
+  html+=`<div class="pnr-grid">
+    <div class="pnr-cell"><div class="k">Train</div><div class="v">${TRAINS["12951"].number} · Rajdhani</div></div>
+    <div class="pnr-cell"><div class="k">Coach / Seat</div><div class="v">${coaches[seed%coaches.length]} · ${seat[seed%seat.length]}</div></div>
+    <div class="pnr-cell"><div class="k">From → To</div><div class="v">MMCT → NDLS</div></div>
+    <div class="pnr-cell"><div class="k">Boarding</div><div class="v">Mumbai Central</div></div>
+    <div class="pnr-cell"><div class="k">Passenger</div><div class="v">${names[seed%names.length]}</div></div>
+    <div class="pnr-cell"><div class="k">Status</div><div class="v" style="color:var(--green)">Confirmed</div></div>
+  </div>`;
+  $("resultBody").innerHTML=html;
+}
+
+/* ============================ live data ============================ */
+function notice(msg){ const n=$("notice"); n.textContent=msg; n.classList.add("show"); }
+function clearNotice(){ $("notice").classList.remove("show"); }
+function setFeed(state){
+  const dot=$("feedDot"), txt=$("feedText");
+  if(state==="live"){ dot.className="dot live"; txt.textContent="Live data"; }
+  else if(state==="error"){ dot.className="dot paused"; txt.textContent="Live error · demo"; }
+  else { dot.className="dot"; txt.textContent="Demo feed"; }
+}
+async function fetchLive(trainNo){
+  clearNotice();
+  const d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  const url=`https://${live.host}${live.path}?train_number=${encodeURIComponent(trainNo)}&departure_date=${ymd}&isH5=true&client=web`;
+  try{
+    const res=await fetch(url,{headers:{"x-rapidapi-key":live.key,"x-rapidapi-host":live.host,"x-rapid-api":"rapid-api-database"}});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    applyLive(trainNo,data);
+    setFeed("live");
+  }catch(err){
+    setFeed("error");
+    notice("Live request failed ("+err.message+"). Showing the demo feed instead. Check the key/host in Live data settings.");
   }
+}
+function applyLive(trainNo,data){
+  // Best-effort mapping; provider shapes vary. We surface raw info in the notice.
+  notice("Live response received for "+trainNo+". Raw fields: "+Object.keys(data||{}).slice(0,8).join(", ")+" — extend applyLive() to map your provider's exact shape.");
+}
+
+/* ============================ controls ============================ */
+function setPlaying(p){
+  playing=p; $("playLabel").textContent=p?"Pause":"Play";
+  $("feedDot").classList.toggle("paused",!p && !live.enabled);
+  if(!live.enabled) $("feedText").textContent=p?"Demo feed":"Paused";
+}
+$("playBtn").onclick=()=>setPlaying(!playing);
+$("rateGroup").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; rate=Number(b.dataset.rate); [...$("rateGroup").children].forEach(x=>x.classList.toggle("active",x===b)); };
+$("scrub").oninput=e=>{ progress=Number(e.target.value)/1000; lastTs=0; render(); };
+$("themeBtn").onclick=()=>{ const h=document.documentElement; const n=h.getAttribute("data-theme")==="dark"?"light":"dark"; h.setAttribute("data-theme",n);
+  $("themeIcon").setAttribute("d",n==="dark"?'M12 3v2M12 19v2M5 12H3M21 12h-2M6 6L4.5 4.5M19.5 19.5 18 18M6 18l-1.5 1.5M19.5 4.5 18 6M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z':'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'); render(); };
+$("modeSeg").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; searchMode=b.dataset.mode; [...$("modeSeg").children].forEach(x=>x.classList.toggle("active",x===b));
+  const inp=$("searchInput"); inp.value="";
+  inp.placeholder = searchMode==="train"?"Train number or name — e.g. 12951, Rajdhani": searchMode==="station"?"Station name or code — e.g. NDLS, Surat":"10-digit PNR — e.g. 4512345678"; };
+$("goBtn").onclick=doSearch;
+$("searchInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doSearch(); });
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showView(t.dataset.view));
+
+/* settings */
+$("settingsBtn").onclick=()=>{ const d=$("settingsDrawer"); d.classList.toggle("open");
+  $("apiHost").value=live.host||"indian-railway-irctc.p.rapidapi.com";
+  $("apiPath").value=live.path||"/api/trains/v1/train/status";
+  $("keyState").textContent = live.enabled ? "Current: live key saved" : "Current: demo feed"; };
+$("saveKeyBtn").onclick=()=>{
+  const host=$("apiHost").value.trim()||"indian-railway-irctc.p.rapidapi.com";
+  const key=$("apiKey").value.trim(), path=$("apiPath").value.trim()||"/api/trains/v1/train/status";
+  if(!key){ notice("Enter a RapidAPI key first."); return; }
+  live={host,key,path,enabled:true};
+  try{ localStorage.setItem("raillive.live",JSON.stringify(live)); }catch(e){}
+  $("keyState").textContent="Current: live key saved"; setFeed("live");
+  notice("Live data enabled. Searches now call "+host+" directly from your browser."); render();
+};
+$("clearKeyBtn").onclick=()=>{ live={host:"",key:"",path:"",enabled:false}; try{ localStorage.removeItem("raillive.live"); }catch(e){}
+  $("apiKey").value=""; $("keyState").textContent="Current: demo feed"; setFeed("demo"); clearNotice(); render(); };
+
+/* ============================ loop ============================ */
+function tick(ts){
+  if(!lastTs) lastTs=ts;
+  const dt=Math.min(0.25,(ts-lastTs)/1000); lastTs=ts;
+  if(playing){ progress+=(simMinPerSec()*dt)/cur.dur; if(progress>=1){progress=1; setPlaying(false);} render(); }
   requestAnimationFrame(tick);
 }
 
-/* ---------- interactions ---------- */
-function setPlaying(p){
-  playing = p;
-  $("playLabel").textContent = p ? "Pause" : "Play";
-  $("playBtn").querySelector("svg").innerHTML = p
-    ? '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'
-    : '<path d="M7 5l12 7-12 7z"></path>';
-  $("liveDot").classList.toggle("paused", !p);
-  $("liveText").textContent = p ? "Live feed" : "Paused";
-}
-$("playBtn").addEventListener("click", ()=> setPlaying(!playing));
-
-$("rateGroup").addEventListener("click", e=>{
-  const b = e.target.closest("button"); if(!b) return;
-  rate = Number(b.dataset.rate);
-  [...$("rateGroup").children].forEach(x=>x.classList.toggle("active", x===b));
-});
-
-$("scrub").addEventListener("input", e=>{
-  progress = Number(e.target.value)/1000;
-  lastTs = 0; render();
-});
-
-$("themeBtn").addEventListener("click", ()=>{
-  const html = document.documentElement;
-  const next = html.getAttribute("data-theme")==="dark" ? "light" : "dark";
-  html.setAttribute("data-theme", next);
-  $("themeIcon").setAttribute("d", next==="dark"
-    ? 'M12 3v2M12 19v2M5 12H3M21 12h-2M6 6L4.5 4.5M19.5 19.5 18 18M6 18l-1.5 1.5M19.5 4.5 18 6M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'
-    : 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z');
-  render();
-});
-
-function loadTrain(num){
-  const t = TRAINS[num]; if(!t) return;
-  cur = t;
-  progress = 0.35 + Math.random()*0.2;
-  lastTs = 0;
-  setPlaying(true);
-  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active", c.dataset.num===num));
-  $("searchInput").value = num;
-  render();
-}
-
-function doSearch(){
-  const q = $("searchInput").value.trim().toLowerCase();
-  if(!q) return;
-  if(TRAINS[q]){ loadTrain(q); return; }
-  const hit = Object.values(TRAINS).find(t =>
-    t.number.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
-  if(hit) loadTrain(hit.number);
-  else { $("searchInput").value=""; $("searchInput").placeholder="No match in this demo — try 12951, 12002, 12621, 12301 or 20901"; }
-}
-$("trackBtn").addEventListener("click", doSearch);
-$("searchInput").addEventListener("keydown", e=>{ if(e.key==="Enter") doSearch(); });
-
-/* ---------- init ---------- */
+/* ============================ init ============================ */
 (function init(){
-  const dl = $("trainList");
-  dl.innerHTML = Object.values(TRAINS).map(t=>`<option value="${t.number}">${t.name}</option>`).join("");
-  const chips = $("chips");
-  chips.innerHTML = Object.values(TRAINS).map(t=>
-    `<span class="chip" data-num="${t.number}">${t.number} · ${t.from}</span>`).join("");
-  chips.addEventListener("click", e=>{ const c=e.target.closest(".chip"); if(c) loadTrain(c.dataset.num); });
+  const chips=$("chips");
+  chips.innerHTML=Object.values(TRAINS).slice(0,6).map(t=>`<span class="chip" data-num="${t.number}">${t.number} · ${t.from}</span>`).join("");
+  chips.onclick=e=>{ const c=e.target.closest(".chip"); if(c) loadTrain(c.dataset.num); };
+  renderDirectory();
+  setFeed(live.enabled?"live":"demo");
   loadTrain("12951");
   requestAnimationFrame(tick);
 })();

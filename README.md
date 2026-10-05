@@ -1,70 +1,69 @@
-# RailLive — Indian Railways Live Train Location
+# रेललाइव · RailLive — Indian Railways Live Train Location
 
-A self-contained static website (single HTML file, no build step, no backend) that
-shows a live-style train-location dashboard for Indian Railways services.
+A self-contained static web app (one HTML file, no build step, no backend) that shows a
+live train-location dashboard for Indian Railways services, styled in a traditional
+Indian visual idiom — a warm parchment/maroon-and-marigold palette, a lotus/rangoli
+medallion, a textile-trim border, and Devanagari titling.
+
+## Features
+
+- **Live status dashboard** — current speed, last reported station, next halt, ETA,
+  a journey progress bar and a simulated IST clock.
+- **Route schematic** — a vertical track map with the train marker moving between stations.
+- **Interactive map** — the route drawn on a Leaflet / OpenStreetMap basemap with station
+  markers and a moving train marker.
+- **Station timetable** — arr/dep, platform, halt, distance and status pills, with delay
+  propagated to downstream stops.
+- **Train directory** — browse all services in the dataset and load any one.
+- **Search modes** — Train (number or name), Station (name or code → trains passing through),
+  and PNR (10-digit lookup).
+- **Live data option** — paste a RapidAPI key to pull real running status directly from the
+  browser (see below). Falls back to the demo feed automatically.
+- **Controls** — pause/play, 1×–30× speed, scrub slider, and a light/dark theme toggle.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | The entire site — HTML, CSS and JavaScript inline. Open it directly in a browser. |
-| `.nojekyll`  | Tells GitHub Pages to serve files as-is (no Jekyll processing). |
+| `index.html` | The entire site — HTML, CSS and JavaScript inline. |
+| `.nojekyll`  | Tells GitHub Pages to serve files as-is. |
 | `README.md`  | This file. |
 
-## Run it locally
+## Run locally
 
-Just double-click `index.html`, or serve the folder:
+Open `index.html` directly, or serve the folder:
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-## Deploy it permanently (free options)
+## Deploy (GitHub Pages)
 
-### Option A — GitHub Pages
-1. Create a new **public** repository, e.g. `raillive`.
-2. Upload `index.html` and `.nojekyll` to the repository root.
-3. Repo → **Settings → Pages** → *Source*: `Deploy from a branch`,
-   *Branch*: `main` / `/ (root)` → **Save**.
-4. After ~1 minute the site is live at:
-   `https://<your-username>.github.io/raillive/`
+1. Upload `index.html` and `.nojekyll` to a public repository.
+2. Repo → **Settings → Pages** → Source: *Deploy from a branch*, Branch: `main` / `/ (root)`.
+3. The site goes live at `https://<username>.github.io/<repo>/`.
 
-### Option B — Netlify Drop (no account setup needed to start)
-1. Go to <https://app.netlify.com/drop>.
-2. Drag this whole folder onto the page.
-3. You get an instant URL like `https://<random-name>.netlify.app`; claim it to keep it.
+## Using real live data
 
-### Option C — Cloudflare Pages / Vercel
-Both accept a folder upload or a connected Git repo and give a permanent
-`*.pages.dev` / `*.vercel.app` URL.
+The page ships with a **demo feed** (representative timetables — positions and delays are
+illustrative, not official). To use real data:
 
-## Connecting real live data
+1. Get a key for an Indian Railways live-status API on RapidAPI — the build targets the
+   *Indian Railway IRCTC* API (`indian-railway-irctc.p.rapidapi.com`,
+   `GET /api/trains/v1/train/status`).
+2. Click the gear icon (**Live data settings**) in the site header.
+3. Paste the RapidAPI key (and host/path if you use a different provider) and save.
 
-The page currently renders **representative sample data** baked into `index.html`
-(see the `TRAINS` object). To make it authoritative, serve it from a small backend
-that proxies a licensed live-status API (NTES or a rail-data provider) and returns
-JSON in this shape — the UI then needs no changes:
+The key is stored only in your browser's `localStorage` — it is never written into the
+page source or committed to the repository. Because RapidAPI endpoints send CORS headers,
+the request is made directly from the browser; there is no backend.
 
-```json
-{
-  "number": "12951",
-  "name": "Mumbai Central – New Delhi Rajdhani Express",
-  "from": "Mumbai Central",
-  "to": "New Delhi",
-  "days": "Daily",
-  "delay": 18,
-  "stations": [
-    { "code": "MMCT", "name": "Mumbai Central", "dist": 0, "sched": "17:00", "dep": "17:00", "plat": "5", "halt": "—" }
-  ]
-}
-```
-
-A backend proxy is required because browser pages cannot call most rail-data APIs
-directly (CORS) and must never hold an API key in client-side code.
+**Note:** the default `applyLive()` handler prints the provider's raw response fields so you
+can map your exact provider shape. Adjust `applyLive()` in `index.html` to bind the response
+to the UI once you know the field names your provider returns.
 
 ## Notes
 
-- Fonts (Space Grotesk, JetBrains Mono) load from Google Fonts; the page degrades
-  gracefully to system fonts offline.
-- Positions and delays are illustrative, not official.
+- Fonts (Tiro Devanagari Hindi, Mukta, JetBrains Mono) and Leaflet load from CDNs; the page
+  degrades gracefully offline (the map basemap will not load without internet).
+- Always cross-check against the official NTES / enquiry.indianrail.gov.in before travel.
