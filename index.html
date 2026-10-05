@@ -225,6 +225,10 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
 .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:14px 18px;background:var(--surface);
   border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .controls .lbl{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
+.controls .grp{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.controls .grp-live{display:none}
+.controls.live .grp-sim{display:none}
+.controls.live .grp-live{display:flex}
 .ctrl-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:10px;height:38px;
   padding:0 15px;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.15s}
 .ctrl-btn:hover{background:var(--surface-3);border-color:var(--border-strong)}
@@ -376,14 +380,20 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
       </div>
     </div>
 
-    <div class="controls">
-      <button class="ctrl-btn" id="playBtn"><span id="playLabel">Pause</span></button>
-      <span class="lbl">Speed</span>
-      <div class="rate-group" id="rateGroup">
-        <button data-rate="1">1×</button><button data-rate="4" class="active">4×</button>
-        <button data-rate="12">12×</button><button data-rate="30">30×</button>
+    <div class="controls" id="controls">
+      <div class="grp grp-sim">
+        <button class="ctrl-btn" id="playBtn"><span id="playLabel">Pause</span></button>
+        <span class="lbl">Speed</span>
+        <div class="rate-group" id="rateGroup">
+          <button data-rate="1">1×</button><button data-rate="4" class="active">4×</button>
+          <button data-rate="12">12×</button><button data-rate="30">30×</button>
+        </div>
+        <div class="scrub"><span class="lbl">Scrub</span><input type="range" id="scrub" min="0" max="1000" value="0"></div>
       </div>
-      <div class="scrub"><span class="lbl">Scrub</span><input type="range" id="scrub" min="0" max="1000" value="0"></div>
+      <div class="grp grp-live">
+        <button class="ctrl-btn" id="refreshBtn">Refresh live</button>
+        <span class="lbl" id="updatedAt">—</span>
+      </div>
     </div>
   </div>
 
@@ -411,29 +421,23 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
 
   <!-- settings -->
   <div class="drawer" id="settingsDrawer">
-    <h3>Live data settings</h3>
-    <p>The page ships with a <b>demo feed</b> (representative sample data). To use real live status, paste a
-       <b>RapidAPI key</b> for an Indian Railways live-status API below. It is stored only in this browser
-       (localStorage) and is never written into the page source.</p>
-    <label for="apiHost">RapidAPI host</label>
-    <input id="apiHost" placeholder="indian-railway-irctc.p.rapidapi.com">
-    <label for="apiKey">RapidAPI key (x-rapidapi-key)</label>
-    <input id="apiKey" type="password" placeholder="paste your key">
-    <label for="apiPath">Status endpoint path</label>
-    <input id="apiPath" placeholder="/api/trains/v1/train/status">
-    <div class="row">
-      <button class="ctrl-btn" id="saveKeyBtn">Save &amp; go live</button>
-      <button class="ctrl-btn" id="clearKeyBtn">Clear (back to demo)</button>
-      <span class="tiny" id="keyState"></span>
+    <h3>Live data</h3>
+    <p>RailLive fetches <b>real live running status</b> for any train number from the free, keyless
+       <b>TrainTrack</b> API — no sign-up, no key, nothing to configure. Requests go straight from your browser.</p>
+    <div class="pnr-grid">
+      <div class="pnr-cell"><div class="k">Source</div><div class="v">traintrack.stupidlabs.lol</div></div>
+      <div class="pnr-cell"><div class="k">Status</div><div class="v" id="keyState">—</div></div>
     </div>
-    <p class="tiny" style="margin-top:12px">Calls are made directly from your browser to the API host (RapidAPI endpoints send CORS headers). If a request fails, the page falls back to the demo feed automatically.</p>
+    <div class="row"><button class="ctrl-btn" id="refreshBtn2">Refresh now</button></div>
+    <p class="tiny" style="margin-top:12px">Live data is unofficial NTES-derived data and may be delayed or temporarily
+       unavailable; if the service can't be reached, RailLive falls back to a small built-in sample set.</p>
   </div>
 
   <div class="foot">
-    <b>About.</b> रेललाइव / RailLive is a single-file static web app for Indian Railways live train location. By default it
-    renders a <b>demo feed</b> of representative timetables — positions and delays are illustrative, not official.
-    Add a live-status API key in <b>Live data settings</b> to pull real running status; the page then calls the provider
-    directly from your browser. Always cross-check against the official NTES / enquiry.indianrail.gov.in before travel.
+    <b>About.</b> रेललाइव / RailLive is a single-file static web app for Indian Railways live train location, styled in a
+    traditional Indian idiom. It pulls <b>real live running status</b> (schedule, delays, platforms and position) for any
+    train number from the free, keyless TrainTrack API, directly in your browser. Data is unofficial NTES-derived and may
+    be delayed or briefly unavailable — always cross-check against the official NTES / enquiry.indianrail.gov.in before travel.
   </div>
 </div>
 
@@ -537,9 +541,11 @@ let cur = TRAINS["12951"];
 let progress = 0.4, playing = true, rate = 4, lastTs = 0, searchMode = "train";
 const simMinPerSec = () => rate * 0.6;
 
-/* live config */
-let live = { host:"", key:"", path:"", enabled:false };
-try{ const s=JSON.parse(localStorage.getItem("raillive.live")||"{}"); if(s&&s.key){ live={host:s.host||"indian-railway-irctc.p.rapidapi.com",key:s.key,path:s.path||"/api/trains/v1/train/status",enabled:true}; } }catch(e){}
+/* ============================ live config (keyless: TrainTrack) ============================ */
+const API = "https://traintrack.stupidlabs.lol";
+let mode = "demo";            // "live" | "demo"
+let refreshTimer = null, updatedAt = null;
+const AUTO_REFRESH_MS = 60000;
 
 /* ============================ position ============================ */
 function position(){
@@ -549,7 +555,9 @@ function position(){
   const segLen=Math.max(1,b.dist-a.dist), frac=Math.min(1,Math.max(0,(km-a.dist)/segLen));
   const segMin=Math.max(1,b.schedMin-a.depMin), base=(segLen/(segMin/60));
   const speed=Math.max(0,Math.min(165,Math.round(base*(0.94+0.12*Math.sin(km*0.05)))));
-  const lat=a.lat+(b.lat-a.lat)*frac, lng=a.lng+(b.lng-a.lng)*frac;
+  const ok=a.lat!=null&&a.lng!=null&&b.lat!=null&&b.lng!=null;
+  const lat=ok?a.lat+(b.lat-a.lat)*frac:(a.lat!=null?a.lat:null);
+  const lng=ok?a.lng+(b.lng-a.lng)*frac:(a.lng!=null?a.lng:null);
   return {km,i,a,b,frac,speed,lat,lng};
 }
 
@@ -576,7 +584,7 @@ function render(){
   $("progFill").style.width=(progress*100).toFixed(1)+"%";
   $("progDone").textContent=Math.round(p.km).toLocaleString("en-IN")+" km covered";
   $("progLeft").textContent=Math.max(0,Math.round(cur.total-p.km)).toLocaleString("en-IN")+" km to go";
-  $("progSim").textContent=(live.enabled?"LIVE · ":"Sim clock ")+fmtMin(simMin)+" IST";
+  $("progSim").textContent=(mode==="live"?"Live · reported ":"Sim clock ")+fmtMin(simMin)+" IST";
   $("scrub").value=Math.round(progress*1000);
   $("stnHint").textContent=st.length+" stops";
   $("mapHint").textContent=cur.number+" · "+cur.from+" → "+cur.to;
@@ -617,10 +625,17 @@ function drawTable(idx,km,delay){
     if(k===st.length-1 && km>=cur.total-0.5){ cls=""; status='<span class="pill now">Arrived</span>'; }
     if(k>idx+1){ cls=""; status='<span class="pill dep">Upcoming</span>'; }
     if(k===0 && idx===0 && km<0.5){ cls="current"; status='<span class="pill now">At station</span>'; }
-    const showDelay=k>idx && delay>3;
-    const arrT=n.sched==="—"?"—":fmtMin(n.schedMin+(k>idx?delay:0));
-    const depT=n.dep==="—"?"—":fmtMin(n.depMin+(k>idx?delay:0));
-    rows+=`<tr class="${cls}"><td class="code">${n.code}</td><td class="nm">${n.name}<small>${n.dist.toLocaleString("en-IN")} km · halt ${n.halt}</small></td><td class="t ${showDelay?'delay':''}">${arrT}${showDelay?'<small style="display:block;font-size:9.5px;opacity:.8">+'+delay+'</small>':''}</td><td class="t ${showDelay?'delay':''}">${depT}</td><td class="plat">${n.plat}</td><td>${status}</td></tr>`;
+    const l=n._live||{}, showDelay=k>idx && delay>3;
+    let arrT, depT, plat=n.plat;
+    if(l.actual_arrival || l.actual_departure){
+      arrT=l.actual_arrival?fmtAny(l.actual_arrival):(n.sched==="—"?"—":fmtMin(n.schedMin+delay));
+      depT=l.actual_departure?fmtAny(l.actual_departure):(n.dep==="—"?"—":fmtMin(n.depMin+delay));
+      plat=l.platform||n.plat;
+    } else {
+      arrT=n.sched==="—"?"—":fmtMin(n.schedMin+(k>idx?delay:0));
+      depT=n.dep==="—"?"—":fmtMin(n.depMin+(k>idx?delay:0));
+    }
+    rows+=`<tr class="${cls}"><td class="code">${n.code}</td><td class="nm">${n.name}<small>${n.dist.toLocaleString("en-IN")} km · halt ${n.halt}</small></td><td class="t ${showDelay?'delay':''}">${arrT}${showDelay?'<small style="display:block;font-size:9.5px;opacity:.8">+'+delay+'</small>':''}</td><td class="t ${showDelay?'delay':''}">${depT}</td><td class="plat">${plat}</td><td>${status}</td></tr>`;
   });
   $("stnBody").innerHTML=rows;
 }
@@ -637,15 +652,18 @@ function updateMap(p){
   if(routeLayer){ map.removeLayer(routeLayer); }
   if(trainMarker){ map.removeLayer(trainMarker); }
   routeLayer=L.layerGroup().addTo(map);
-  const pts=cur.stations.map(s=>[s.lat,s.lng]);
-  L.polyline(pts,{color:"#7a1f2b",weight:4,opacity:0.85}).addTo(routeLayer);
-  cur.stations.forEach((s,k)=>{
+  const withCoords=cur.stations.filter(s=>typeof s.lat==="number" && typeof s.lng==="number");
+  const pts=withCoords.map(s=>[s.lat,s.lng]);
+  if(pts.length>1) L.polyline(pts,{color:"#7a1f2b",weight:4,opacity:0.85}).addTo(routeLayer);
+  withCoords.forEach(s=>{
     L.circleMarker([s.lat,s.lng],{radius:5,color:"#b07d10",weight:2,fillColor:"#fffdf7",fillOpacity:1})
       .bindTooltip(s.code+" · "+s.name,{direction:"top"}).addTo(routeLayer);
   });
   const icon=L.divIcon({className:"",html:'<div class="train-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="14" rx="3"></rect><path d="M5 10h14"></path><circle cx="8.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="13.5" r="1.1" fill="currentColor" stroke="none"></circle></svg></div>',iconSize:[34,34],iconAnchor:[17,17]});
-  trainMarker=L.marker([p.lat,p.lng],{icon:icon}).addTo(map).bindPopup("<b>"+cur.number+"</b> "+cur.name);
-  map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
+  if(typeof p.lat==="number" && typeof p.lng==="number"){
+    trainMarker=L.marker([p.lat,p.lng],{icon:icon}).addTo(map).bindPopup("<b>"+cur.number+"</b> "+cur.name);
+  }
+  if(pts.length>1) map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
 }
 
 /* ============================ tabs ============================ */
@@ -667,24 +685,68 @@ function renderDirectory(){
 }
 
 /* ============================ search ============================ */
-function loadTrain(num){
-  const t=TRAINS[num]; if(!t) return;
-  cur=t; progress=0.35+Math.random()*0.2; lastTs=0; setPlaying(true);
-  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.dataset.num===num));
-  $("searchInput").value=num;
-  render(); if(map) updateMap(position());
+function timeStr(d){ return d ? d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})+" IST" : "—"; }
+function fmtAny(s){ const m=String(s).match(/(\d{1,2}):(\d{2})/); return m? m[1].padStart(2,"0")+":"+m[2] : String(s); }
+function hmOf(s){ const m=(s||"").match(/(\d{1,2}):(\d{2})/); return m? Number(m[1])*60+Number(m[2]) : null; }
+function delayMin(d){ if(d==null) return 0; const s=String(d); if(/on\s*time/i.test(s)) return 0; const m=s.match(/(\d{1,2}):(\d{2})/); if(m) return Number(m[1])*60+Number(m[2]); const n=s.match(/(\d+)/); return n?Number(n[1]):0; }
+function titleCase(s){ return (s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
+function daysFromMask(mask){
+  const m=String(mask||""); if(m.length!==7) return mask||"—";
+  if(m==="1111111") return "Daily";
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  return days.filter((d,i)=>m[i]==="1").join(", ")||"—";
 }
-function doSearch(){
-  const q=$("searchInput").value.trim();
-  if(!q) return;
-  if(searchMode==="pnr"){ renderPNR(q); showView("result"); return; }
-  if(searchMode==="station"){ renderStation(q); showView("result"); return; }
-  const ql=q.toLowerCase();
-  if(TRAINS[q]){ loadTrain(q); showView("dash"); return; }
-  const hit=Object.values(TRAINS).find(t=>t.number.toLowerCase().includes(ql)||t.name.toLowerCase().includes(ql));
-  if(hit){ loadTrain(hit.number); showView("dash"); return; }
-  if(live.enabled){ fetchLive(q); return; }
-  notice("No train matched “"+q+"” in the demo set. Try 12951, 12002, 12621, 12301, 20901, 12051, 12627, 12841 or 12009.");
+
+async function loadTrain(num){
+  num=String(num||"").replace(/\D/g,""); if(!num) return;
+  clearNotice(); setFeed("loading");
+  try{
+    const [sch,liv]=await Promise.all([
+      getJSON(`/api/trains/${num}/schedule`),
+      getJSON(`/api/trains/${num}/live`).catch(()=>null)
+    ]);
+    if(!sch || !sch.stops || !sch.stops.length) throw new Error("no schedule returned");
+    cur=buildFromAPI(num,sch,liv);
+    mode="live"; setPlaying(false);
+    progress = cur.total ? (cur._km/cur.total) : 0;
+    updatedAt=new Date();
+    document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.dataset.num===num));
+    $("searchInput").value=num;
+    $("controls").classList.add("live");
+    $("updatedAt").textContent="Updated "+timeStr(updatedAt);
+    render(); if(map) updateMap(position());
+    setFeed("live");
+    scheduleRefresh(num);
+  }catch(err){
+    if(TRAINS[num]){
+      cur=TRAINS[num]; mode="demo"; progress=0.35+Math.random()*0.2; setPlaying(true);
+      $("searchInput").value=num;
+      document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.dataset.num===num));
+      $("controls").classList.remove("live");
+      render(); if(map) updateMap(position());
+      setFeed("error");
+      notice("Live service unreachable — showing the built-in sample for train "+num+".");
+    } else {
+      setFeed("error");
+      notice("Couldn't load train "+num+". Check the number — the live service may be busy.");
+    }
+  }
+}
+async function doSearch(){
+  const q=$("searchInput").value.trim(); if(!q) return;
+  if(searchMode==="pnr"){ showView("result"); renderPNR(q); return; }
+  if(searchMode==="station"){ showView("result"); renderStation(q); return; }
+  if(/^\d{4,6}$/.test(q)){ showView("dash"); loadTrain(q); return; }
+  setFeed("loading"); showView("dash");
+  try{
+    const r=await getJSON(`/api/trains/search?q=${encodeURIComponent(q)}`);
+    const t=(r && r.trains && r.trains[0]) || null;
+    if(t && t.number){ loadTrain(t.number); return; }
+  }catch(e){}
+  const hit=Object.values(TRAINS).find(t=>t.name.toLowerCase().includes(q.toLowerCase())||t.number.includes(q));
+  if(hit){ loadTrain(hit.number); return; }
+  setFeed("demo");
+  notice('No train matched "'+q+'". Try a number like 12951, or a name like Rajdhani.');
 }
 function renderStation(q){
   const ql=q.toLowerCase();
@@ -697,64 +759,100 @@ function renderStation(q){
   $("resultBody").innerHTML=html;
   $("resultBody").querySelectorAll(".hit").forEach(h=>h.onclick=()=>{ loadTrain(h.dataset.num); showView("dash"); });
 }
-function renderPNR(pnr){
+async function renderPNR(pnr){
   const digits=(pnr.match(/\d/g)||[]).join("");
-  if(digits.length<10){ $("resultBody").innerHTML=`<h3>Enter a 10-digit PNR</h3><div class="sub">A PNR is printed on your ticket — e.g. 4512345678.</div>`; return; }
-  // deterministic sample (demo feed)
-  const names=["A. Sharma","R. Iyer","S. Khan","P. Nair","M. Verma","D. Bose"];
-  const seed=digits.split("").reduce((a,c)=>a+Number(c),0);
-  const coaches=["B2","S4","A1","B1","S2"];
-  const seat=["32 (LB)","58 (UB)","21 (MB)","44 (SL)","17 (LB)"];
-  let html=`<h3>PNR ${digits}</h3><div class="sub">${live.enabled?"Provider key set — but PNR needs a PNR endpoint; showing demo":"Demo feed · representative sample"}</div>`;
-  html+=`<div class="pnr-grid">
-    <div class="pnr-cell"><div class="k">Train</div><div class="v">${TRAINS["12951"].number} · Rajdhani</div></div>
-    <div class="pnr-cell"><div class="k">Coach / Seat</div><div class="v">${coaches[seed%coaches.length]} · ${seat[seed%seat.length]}</div></div>
-    <div class="pnr-cell"><div class="k">From → To</div><div class="v">MMCT → NDLS</div></div>
-    <div class="pnr-cell"><div class="k">Boarding</div><div class="v">Mumbai Central</div></div>
-    <div class="pnr-cell"><div class="k">Passenger</div><div class="v">${names[seed%names.length]}</div></div>
-    <div class="pnr-cell"><div class="k">Status</div><div class="v" style="color:var(--green)">Confirmed</div></div>
-  </div>`;
-  $("resultBody").innerHTML=html;
+  if(digits.length!==10){ $("resultBody").innerHTML=`<h3>Enter a 10-digit PNR</h3><div class="sub">A PNR is printed on your ticket — e.g. 4512345678.</div>`; return; }
+  $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">Checking live status…</div>`;
+  try{
+    const d=await getJSON(`/api/pnr/${digits}`);
+    if(!d || !d.train){ $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">No data returned for this PNR.</div>`; return; }
+    let html=`<h3>PNR ${digits}</h3><div class="sub">Live PNR status</div><div class="pnr-grid">
+      <div class="pnr-cell"><div class="k">Train</div><div class="v">${d.train.number||"—"} · ${titleCase(d.train.name||"")}</div></div>
+      <div class="pnr-cell"><div class="k">From → To</div><div class="v">${d.train.source||"—"} → ${d.train.destination||"—"}</div></div>
+      <div class="pnr-cell"><div class="k">Journey date</div><div class="v">${d.train.journey_date||"—"}</div></div>
+      <div class="pnr-cell"><div class="k">Chart</div><div class="v">${d.chart_status||"—"}</div></div>
+    </div>`;
+    (d.passengers||[]).forEach(p=>{
+      html+=`<div class="hit"><div class="dir-no">#${p.serial||""}</div><div class="dir-main"><div class="hit-name">Booking: ${p.booking_status||"—"}</div><div class="dir-route">Current: ${p.current_status||"—"}</div></div></div>`;
+    });
+    $("resultBody").innerHTML=html;
+  }catch(err){
+    $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">Live lookup failed (${err.message}). Try again in a moment.</div>`;
+  }
 }
 
-/* ============================ live data ============================ */
+/* ============================ live data (TrainTrack, keyless) ============================ */
 function notice(msg){ const n=$("notice"); n.textContent=msg; n.classList.add("show"); }
 function clearNotice(){ $("notice").classList.remove("show"); }
 function setFeed(state){
   const dot=$("feedDot"), txt=$("feedText");
   if(state==="live"){ dot.className="dot live"; txt.textContent="Live data"; }
-  else if(state==="error"){ dot.className="dot paused"; txt.textContent="Live error · demo"; }
-  else { dot.className="dot"; txt.textContent="Demo feed"; }
+  else if(state==="loading"){ dot.className="dot paused"; txt.textContent="Fetching…"; }
+  else if(state==="error"){ dot.className="dot paused"; txt.textContent="Offline · sample"; }
+  else { dot.className="dot"; txt.textContent="Sample feed"; }
 }
-async function fetchLive(trainNo){
-  clearNotice();
-  const d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
-  const url=`https://${live.host}${live.path}?train_number=${encodeURIComponent(trainNo)}&departure_date=${ymd}&isH5=true&client=web`;
+async function getJSON(path, ms){
+  ms=ms||12000;
+  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
   try{
-    const res=await fetch(url,{headers:{"x-rapidapi-key":live.key,"x-rapidapi-host":live.host,"x-rapid-api":"rapid-api-database"}});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const data=await res.json();
-    applyLive(trainNo,data);
-    setFeed("live");
-  }catch(err){
-    setFeed("error");
-    notice("Live request failed ("+err.message+"). Showing the demo feed instead. Check the key/host in Live data settings.");
-  }
+    const r=await fetch(API+path,{signal:ctl.signal,headers:{Accept:"application/json"}});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
 }
-function applyLive(trainNo,data){
-  // Best-effort mapping; provider shapes vary. We surface raw info in the notice.
-  notice("Live response received for "+trainNo+". Raw fields: "+Object.keys(data||{}).slice(0,8).join(", ")+" — extend applyLive() to map your provider's exact shape.");
+function buildFromAPI(num, sch, liv){
+  const raw=(sch&&sch.stops)||[];
+  const liveByCode={}; ((liv&&liv.stops)||[]).forEach(s=>{ liveByCode[s.code]=s; });
+  const stops=raw.map(s=>{
+    const arr=(s.arrival||"").trim(), dep=(s.departure||"").trim();
+    const c=s.coordinates||{};
+    const lat=(c.lat!=null?c.lat:(c.latitude!=null?c.latitude:null));
+    const lng=(c.lon!=null?c.lon:(c.lng!=null?c.lng:(c.longitude!=null?c.longitude:null)));
+    const l=liveByCode[s.code]||{};
+    const a=hmOf(arr), d=hmOf(dep);
+    return {code:s.code,name:titleCase(s.name),dist:Number(s.distance_km)||0,
+      sched:arr||dep||"—", dep:dep||arr||"—",
+      plat:(l.platform||s.platform||"—"),
+      halt:(a!=null&&d!=null&&d>a)?(d-a)+" min":"—",
+      lat,lng,day:Number(s.day)||1,_live:l,_arrMin:a,_depMin:d};
+  });
+  stops.forEach((s,i)=>{
+    const base=(s.day-1)*1440;
+    s.schedMin=(s._arrMin!=null?base+s._arrMin:(s._depMin!=null?base+s._depMin:(i>0?stops[i-1].schedMin:0)));
+    s.depMin=(s._depMin!=null?base+s._depMin:s.schedMin);
+    if(i>0 && s.schedMin<stops[i-1].schedMin) s.schedMin=stops[i-1].schedMin;
+    if(s.depMin<s.schedMin) s.depMin=s.schedMin;
+  });
+  const cp=(liv&&liv.current_position)||{};
+  let idx=0; if(cp.code){ const k=stops.findIndex(s=>s.code===cp.code); if(k>=0) idx=k; }
+  const status=(cp.status||"").toLowerCase();
+  const total=stops.length?stops[stops.length-1].dist:0;
+  let km=stops[idx]?stops[idx].dist:0;
+  if(status==="departed" && idx<stops.length-1) km=stops[idx].dist+0.5*(stops[idx+1].dist-stops[idx].dist);
+  return {number:num, name:(liv&&liv.name)||(sch&&sch.name)||("Train "+num),
+    from:stops.length?stops[0].name:titleCase((sch&&sch.source)||""),
+    to:stops.length?stops[stops.length-1].name:titleCase((sch&&sch.destination)||""),
+    days:daysFromMask(sch&&sch.days_of_run), delay:delayMin(cp.delay),
+    total, stations:stops, startMin:stops.length?stops[0].depMin:0,
+    endMin:stops.length?stops[stops.length-1].schedMin:1,
+    dur:Math.max(1,(stops.length?stops[stops.length-1].schedMin:1)-(stops.length?stops[0].depMin:0)),
+    _km:km};
+}
+function scheduleRefresh(num){
+  if(refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(()=>{ if(mode==="live") loadTrain(num); }, AUTO_REFRESH_MS);
 }
 
 /* ============================ controls ============================ */
 function setPlaying(p){
   playing=p; $("playLabel").textContent=p?"Pause":"Play";
-  $("feedDot").classList.toggle("paused",!p && !live.enabled);
-  if(!live.enabled) $("feedText").textContent=p?"Demo feed":"Paused";
+  if(mode==="demo"){ $("feedDot").classList.toggle("paused",!p); $("feedText").textContent=p?"Sample feed":"Paused"; }
 }
 $("playBtn").onclick=()=>setPlaying(!playing);
 $("rateGroup").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; rate=Number(b.dataset.rate); [...$("rateGroup").children].forEach(x=>x.classList.toggle("active",x===b)); };
 $("scrub").oninput=e=>{ progress=Number(e.target.value)/1000; lastTs=0; render(); };
+$("refreshBtn").onclick=()=>{ if(cur) loadTrain(cur.number); };
+$("refreshBtn2").onclick=()=>{ if(cur) loadTrain(cur.number); };
 $("themeBtn").onclick=()=>{ const h=document.documentElement; const n=h.getAttribute("data-theme")==="dark"?"light":"dark"; h.setAttribute("data-theme",n);
   $("themeIcon").setAttribute("d",n==="dark"?'M12 3v2M12 19v2M5 12H3M21 12h-2M6 6L4.5 4.5M19.5 19.5 18 18M6 18l-1.5 1.5M19.5 4.5 18 6M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z':'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'); render(); };
 $("modeSeg").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; searchMode=b.dataset.mode; [...$("modeSeg").children].forEach(x=>x.classList.toggle("active",x===b));
@@ -766,26 +864,13 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showView(t.dataset.vi
 
 /* settings */
 $("settingsBtn").onclick=()=>{ const d=$("settingsDrawer"); d.classList.toggle("open");
-  $("apiHost").value=live.host||"indian-railway-irctc.p.rapidapi.com";
-  $("apiPath").value=live.path||"/api/trains/v1/train/status";
-  $("keyState").textContent = live.enabled ? "Current: live key saved" : "Current: demo feed"; };
-$("saveKeyBtn").onclick=()=>{
-  const host=$("apiHost").value.trim()||"indian-railway-irctc.p.rapidapi.com";
-  const key=$("apiKey").value.trim(), path=$("apiPath").value.trim()||"/api/trains/v1/train/status";
-  if(!key){ notice("Enter a RapidAPI key first."); return; }
-  live={host,key,path,enabled:true};
-  try{ localStorage.setItem("raillive.live",JSON.stringify(live)); }catch(e){}
-  $("keyState").textContent="Current: live key saved"; setFeed("live");
-  notice("Live data enabled. Searches now call "+host+" directly from your browser."); render();
-};
-$("clearKeyBtn").onclick=()=>{ live={host:"",key:"",path:"",enabled:false}; try{ localStorage.removeItem("raillive.live"); }catch(e){}
-  $("apiKey").value=""; $("keyState").textContent="Current: demo feed"; setFeed("demo"); clearNotice(); render(); };
+  $("keyState").textContent = mode==="live" ? ("Live · updated "+timeStr(updatedAt)) : "Sample feed"; };
 
 /* ============================ loop ============================ */
 function tick(ts){
   if(!lastTs) lastTs=ts;
   const dt=Math.min(0.25,(ts-lastTs)/1000); lastTs=ts;
-  if(playing){ progress+=(simMinPerSec()*dt)/cur.dur; if(progress>=1){progress=1; setPlaying(false);} render(); }
+  if(playing && mode==="demo"){ progress+=(simMinPerSec()*dt)/cur.dur; if(progress>=1){progress=1; setPlaying(false);} render(); }
   requestAnimationFrame(tick);
 }
 
@@ -795,7 +880,7 @@ function tick(ts){
   chips.innerHTML=Object.values(TRAINS).slice(0,6).map(t=>`<span class="chip" data-num="${t.number}">${t.number} · ${t.from}</span>`).join("");
   chips.onclick=e=>{ const c=e.target.closest(".chip"); if(c) loadTrain(c.dataset.num); };
   renderDirectory();
-  setFeed(live.enabled?"live":"demo");
+  setFeed("demo");
   loadTrain("12951");
   requestAnimationFrame(tick);
 })();

@@ -1,25 +1,34 @@
 # रेललाइव · RailLive — Indian Railways Live Train Location
 
-A self-contained static web app (one HTML file, no build step, no backend) that shows a
-live train-location dashboard for Indian Railways services, styled in a traditional
-Indian visual idiom — a warm parchment/maroon-and-marigold palette, a lotus/rangoli
-medallion, a textile-trim border, and Devanagari titling.
+A self-contained static web app (one HTML file, no build step, no backend) that shows
+**real live running status** for Indian Railways trains, styled in a traditional Indian
+idiom — a warm parchment, maroon and marigold palette, a lotus/rangoli medallion, a
+textile-trim border, and Devanagari titling.
+
+## Real live data, no key
+
+Live data comes from the free, keyless **[TrainTrack](https://traintrack.stupidlabs.lol/)**
+API (an unofficial NTES-derived JSON service). Because it is browser-callable, the page
+fetches directly from the visitor's browser — there is no backend and no API key to manage.
+
+- `GET /api/trains/{number}/schedule` — stops, times, distances, coordinates
+- `GET /api/trains/{number}/live` — current position, delay, platforms
+- `GET /api/trains/search?q=` — search by name or number
+- `GET /api/pnr/{pnr}` — PNR status
+
+Enter **any** train number and the dashboard, route schematic, map and timetable are built
+from the real schedule and the latest reported position. A small built-in sample set is used
+only as an offline fallback if the service cannot be reached.
 
 ## Features
 
-- **Live status dashboard** — current speed, last reported station, next halt, ETA,
-  a journey progress bar and a simulated IST clock.
-- **Route schematic** — a vertical track map with the train marker moving between stations.
-- **Interactive map** — the route drawn on a Leaflet / OpenStreetMap basemap with station
-  markers and a moving train marker.
-- **Station timetable** — arr/dep, platform, halt, distance and status pills, with delay
-  propagated to downstream stops.
-- **Train directory** — browse all services in the dataset and load any one.
-- **Search modes** — Train (number or name), Station (name or code → trains passing through),
-  and PNR (10-digit lookup).
-- **Live data option** — paste a RapidAPI key to pull real running status directly from the
-  browser (see below). Falls back to the demo feed automatically.
-- **Controls** — pause/play, 1×–30× speed, scrub slider, and a light/dark theme toggle.
+- **Live status dashboard** — speed, last reported station, next halt, ETA, progress bar.
+- **Route schematic** — vertical track map with the train's reported position.
+- **Interactive map** — route on a Leaflet / OpenStreetMap basemap with a moving marker.
+- **Station timetable** — actual times, delays, platforms and status where reported.
+- **Train directory** — popular services, one click to load live.
+- **Search modes** — Train (number or name), Station, and PNR.
+- **Light/dark theme**, pause/scrub controls for the offline sample, auto-refresh every 60s.
 
 ## Files
 
@@ -31,39 +40,17 @@ medallion, a textile-trim border, and Devanagari titling.
 
 ## Run locally
 
-Open `index.html` directly, or serve the folder:
-
-```bash
-python3 -m http.server 8000   # then open http://localhost:8000
-```
+Open `index.html`, or serve the folder: `python3 -m http.server 8000`.
 
 ## Deploy (GitHub Pages)
 
-1. Upload `index.html` and `.nojekyll` to a public repository.
-2. Repo → **Settings → Pages** → Source: *Deploy from a branch*, Branch: `main` / `/ (root)`.
-3. The site goes live at `https://<username>.github.io/<repo>/`.
-
-## Using real live data
-
-The page ships with a **demo feed** (representative timetables — positions and delays are
-illustrative, not official). To use real data:
-
-1. Get a key for an Indian Railways live-status API on RapidAPI — the build targets the
-   *Indian Railway IRCTC* API (`indian-railway-irctc.p.rapidapi.com`,
-   `GET /api/trains/v1/train/status`).
-2. Click the gear icon (**Live data settings**) in the site header.
-3. Paste the RapidAPI key (and host/path if you use a different provider) and save.
-
-The key is stored only in your browser's `localStorage` — it is never written into the
-page source or committed to the repository. Because RapidAPI endpoints send CORS headers,
-the request is made directly from the browser; there is no backend.
-
-**Note:** the default `applyLive()` handler prints the provider's raw response fields so you
-can map your exact provider shape. Adjust `applyLive()` in `index.html` to bind the response
-to the UI once you know the field names your provider returns.
+Upload `index.html` and `.nojekyll` to a public repo → **Settings → Pages** → Source:
+*Deploy from a branch*, `main` / `/ (root)`.
 
 ## Notes
 
+- Live data is **unofficial** and may be delayed, incomplete or briefly unavailable. Always
+  confirm travel-critical details via the official NTES / enquiry.indianrail.gov.in.
 - Fonts (Tiro Devanagari Hindi, Mukta, JetBrains Mono) and Leaflet load from CDNs; the page
-  degrades gracefully offline (the map basemap will not load without internet).
-- Always cross-check against the official NTES / enquiry.indianrail.gov.in before travel.
+  degrades gracefully offline (the map basemap needs internet).
+- To point at a different provider, change the `API` constant near the top of the script.
