@@ -111,6 +111,14 @@ html[data-theme="dark"] .brand h1 .dv{color:var(--gold-2)}
 .seg button+button{border-left:1px solid var(--border)}
 .seg button.active{background:var(--saffron);color:#fff}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.find-body{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
+.find-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.find-row .field{flex:1;min-width:220px;box-shadow:none}
+.find-sep{display:flex;align-items:center;gap:10px;margin:12px 0;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint)}
+.find-sep::before,.find-sep::after{content:"";height:1px;flex:1;background:var(--border)}
+.mini{height:44px;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:var(--font-mono);font-size:13px;padding:0 12px;min-width:140px;flex:1}
+select.mini{font-family:var(--font-body)}
+.field.grow{flex:1}
 .chip{cursor:pointer;font-family:var(--font-mono);font-size:11.5px;padding:7px 13px;border-radius:999px;
   border:1px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
 .chip:hover{border-color:var(--saffron);color:var(--text)}
@@ -316,16 +324,11 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
   </div>
 
   <div class="searchbar">
-    <div class="seg" id="modeSeg">
-      <button data-mode="train" class="active">Train</button>
-      <button data-mode="station">Station</button>
-      <button data-mode="pnr">PNR</button>
-    </div>
     <label class="field">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-      <input id="searchInput" placeholder="Train number or name — e.g. 12951, Rajdhani" autocomplete="off">
+      <input id="searchInput" placeholder="Track any train — number or name (e.g. 12951, Rajdhani, Duronto)" autocomplete="off">
     </label>
-    <button class="btn" id="goBtn">Search</button>
+    <button class="btn" id="goBtn">Track</button>
   </div>
   <div class="chips" id="chips"></div>
 
@@ -333,8 +336,9 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
 
   <div class="tabs">
     <button class="tab active" data-view="dash">Live status</button>
-    <button class="tab" data-view="map">Map</button>
-    <button class="tab" data-view="dir">All trains</button>
+    <button class="tab" data-view="find">Find trains</button>
+    <button class="tab" data-view="map">Live map</button>
+    <button class="tab" data-view="pnr">PNR</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -400,23 +404,52 @@ html[data-theme="dark"] .dir-no{color:var(--gold-2)}
   <!-- MAP -->
   <div class="view" id="view-map">
     <div class="panel">
-      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Live route map</div><span class="hint" id="mapHint">—</span></div>
+      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Live map</div><span class="hint" id="mapHint">—</span></div>
+      <div class="find-body">
+        <div class="find-row">
+          <input id="trackInput" class="mini" placeholder="Track several trains at once — e.g. 12301, 12951, 12627">
+          <button class="btn" id="trackGo">Track</button>
+        </div>
+      </div>
       <div id="map"></div>
-      <div class="map-note" id="mapNote">The moving marker shows the train's position along its route. Basemap © OpenStreetMap contributors.</div>
+      <div class="map-note" id="mapNote">The marker shows the selected train's reported position; use Track to plot several trains at once. Basemap © OpenStreetMap contributors.</div>
     </div>
   </div>
 
-  <!-- DIRECTORY -->
-  <div class="view" id="view-dir">
+  <!-- FIND TRAINS -->
+  <div class="view" id="view-find">
     <div class="panel">
-      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Train directory</div><span class="hint" id="dirHint">—</span></div>
-      <div class="dir" id="dirList"></div>
+      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>Find trains</div><span class="hint">All Indian Railways</span></div>
+      <div class="find-body">
+        <div class="find-row">
+          <label class="field grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input id="findQ" placeholder="Search any train by name or number — e.g. Rajdhani, 12301, Duronto" autocomplete="off"></label>
+          <button class="btn" id="findGo">Search</button>
+        </div>
+        <div class="find-sep"><span>or find trains between two stations</span></div>
+        <div class="find-row">
+          <input id="fromStn" class="mini" placeholder="From code — e.g. NDLS" list="stnList" autocomplete="off">
+          <input id="toStn" class="mini" placeholder="To code — e.g. HWH" list="stnList" autocomplete="off">
+          <select id="sortSel" class="mini"><option value="">Any order</option><option value="fastest">Fastest</option><option value="earliest">Earliest</option></select>
+          <button class="btn" id="betweenGo">Find</button>
+        </div>
+        <datalist id="stnList"></datalist>
+      </div>
+      <div class="result" id="findResults"><div class="sub">Search the whole Indian Railways network — every train's live status and timetable.</div></div>
     </div>
   </div>
 
-  <!-- SEARCH RESULT PANEL (station / pnr) -->
-  <div class="view" id="view-result">
-    <div class="panel"><div class="result" id="resultBody"></div></div>
+  <!-- PNR -->
+  <div class="view" id="view-pnr">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title"><svg class="lotus"><use href="#lotus"/></svg>PNR status</div><span class="hint">10 digits</span></div>
+      <div class="find-body">
+        <div class="find-row">
+          <label class="field grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input id="pnrQ" placeholder="10-digit PNR — e.g. 4512345678" maxlength="10" inputmode="numeric" autocomplete="off"></label>
+          <button class="btn" id="pnrGo">Check</button>
+        </div>
+      </div>
+      <div class="result" id="pnrResults"><div class="sub">Enter your PNR to see booking and passenger status.</div></div>
+    </div>
   </div>
 
   <!-- settings -->
@@ -674,15 +707,9 @@ function showView(v){
   if(v==="map"){ initMap(); if(map){ setTimeout(()=>{ map.invalidateSize(); updateMap(position()); },80); } }
 }
 
-/* ============================ directory ============================ */
-function renderDirectory(){
-  $("dirHint").textContent=Object.keys(TRAINS).length+" trains";
-  $("dirList").innerHTML=Object.values(TRAINS).map(t=>{
-    const cls=t.delay<=3?"ok":"late", txt=t.delay<=3?"On time":"+"+t.delay+" min";
-    return `<div class="dir-row" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="dir-name">${t.name}</div><div class="dir-route">${t.stations[0].code} ${t.from} → ${t.stations[t.stations.length-1].code} ${t.to} · ${t.total.toLocaleString("en-IN")} km</div></div><span class="dir-delay ${cls}">${txt}</span></div>`;
-  }).join("");
-  $("dirList").onclick=e=>{ const r=e.target.closest(".dir-row"); if(r){ loadTrain(r.dataset.num); showView("dash"); } };
-}
+/* ============================ station list ============================ */
+const POPULAR_STATIONS=[["NDLS","New Delhi"],["HWH","Howrah Jn"],["CSMT","Mumbai CSMT"],["MAS","Chennai Central"],["SBC","KSR Bengaluru"],["SC","Secunderabad Jn"],["PUNE","Pune Jn"],["ADI","Ahmedabad Jn"],["BPL","Bhopal Jn"],["LKO","Lucknow"],["JP","Jaipur"],["PNBE","Patna Jn"],["BBS","Bhubaneswar"],["NGP","Nagpur Jn"],["CNB","Kanpur Central"],["GHY","Guwahati"],["BZA","Vijayawada Jn"],["JAT","Jammu Tawi"],["VSKP","Visakhapatnam"],["ST","Surat"]];
+function fillStationList(){ const dl=$("stnList"); if(dl) dl.innerHTML=POPULAR_STATIONS.map(s=>`<option value="${s[0]}">${s[1]}</option>`).join(""); }
 
 /* ============================ search ============================ */
 function timeStr(d){ return d ? d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})+" IST" : "—"; }
@@ -717,6 +744,7 @@ async function loadTrain(num){
     render(); if(map) updateMap(position());
     setFeed("live");
     scheduleRefresh(num);
+    showExceptions(num);
   }catch(err){
     if(TRAINS[num]){
       cur=TRAINS[num]; mode="demo"; progress=0.35+Math.random()*0.2; setPlaying(true);
@@ -734,8 +762,6 @@ async function loadTrain(num){
 }
 async function doSearch(){
   const q=$("searchInput").value.trim(); if(!q) return;
-  if(searchMode==="pnr"){ showView("result"); renderPNR(q); return; }
-  if(searchMode==="station"){ showView("result"); renderStation(q); return; }
   if(/^\d{4,6}$/.test(q)){ showView("dash"); loadTrain(q); return; }
   setFeed("loading"); showView("dash");
   try{
@@ -746,26 +772,45 @@ async function doSearch(){
   const hit=Object.values(TRAINS).find(t=>t.name.toLowerCase().includes(q.toLowerCase())||t.number.includes(q));
   if(hit){ loadTrain(hit.number); return; }
   setFeed("demo");
-  notice('No train matched "'+q+'". Try a number like 12951, or a name like Rajdhani.');
+  notice('No train matched "'+q+'". Open Find trains to browse the full network.');
 }
-function renderStation(q){
-  const ql=q.toLowerCase();
-  const codes=Object.values(stationIndex).filter(s=>s.code.toLowerCase()===ql||s.name.toLowerCase().includes(ql)||s.code.toLowerCase().includes(ql));
-  if(!codes.length){ $("resultBody").innerHTML=`<h3>No station found</h3><div class="sub">Try a station name or code — e.g. NDLS, New Delhi, Surat, Bhopal.</div>`; return; }
-  let html=`<h3>${codes[0].name}</h3><div class="sub">${codes[0].code} · trains passing through</div>`;
-  codes[0].trains.forEach(t=>{
-    html+=`<div class="hit" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="hit-name">${t.name}</div><div class="dir-route">${t.from} → ${t.to}</div></div></div>`;
-  });
-  $("resultBody").innerHTML=html;
-  $("resultBody").querySelectorAll(".hit").forEach(h=>h.onclick=()=>{ loadTrain(h.dataset.num); showView("dash"); });
+function wireHits(root){ root.querySelectorAll(".hit").forEach(h=>h.onclick=()=>{ loadTrain(h.dataset.num); showView("dash"); }); }
+async function findTrains(){
+  const q=$("findQ").value.trim();
+  if(q.length<2){ $("findResults").innerHTML='<div class="sub">Type at least 2 characters.</div>'; return; }
+  $("findResults").innerHTML='<div class="sub">Searching all trains…</div>';
+  try{
+    const r=await getJSON(`/api/trains/search?q=${encodeURIComponent(q)}`);
+    const list=(r && r.trains) || [];
+    if(!list.length){ $("findResults").innerHTML='<div class="sub">No trains matched "'+q+'".</div>'; return; }
+    $("findResults").innerHTML=`<h3>${list.length} train${list.length>1?"s":""} found</h3><div class="sub">Tap a train for live status &amp; timetable</div>`+list.map(t=>{
+      const sc=(t.source&&t.source.code)||"", sn=(t.source&&t.source.name)||"", dc=(t.destination&&t.destination.code)||"", dn=(t.destination&&t.destination.name)||"";
+      return `<div class="hit" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="hit-name">${t.name||""}</div><div class="dir-route">${sc} ${sn} → ${dc} ${dn}</div></div></div>`;
+    }).join("");
+    wireHits($("findResults"));
+  }catch(err){ $("findResults").innerHTML='<div class="sub">Search failed ('+err.message+'). The live service may be busy.</div>'; }
 }
-async function renderPNR(pnr){
-  const digits=(pnr.match(/\d/g)||[]).join("");
-  if(digits.length!==10){ $("resultBody").innerHTML=`<h3>Enter a 10-digit PNR</h3><div class="sub">A PNR is printed on your ticket — e.g. 4512345678.</div>`; return; }
-  $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">Checking live status…</div>`;
+async function findBetween(){
+  const from=$("fromStn").value.trim().toUpperCase(), to=$("toStn").value.trim().toUpperCase(), sort=$("sortSel").value;
+  if(!from||!to){ $("findResults").innerHTML='<div class="sub">Enter both station codes, e.g. NDLS and HWH.</div>'; return; }
+  $("findResults").innerHTML='<div class="sub">Searching trains between '+from+' and '+to+'…</div>';
+  try{
+    const r=await getJSON(`/api/trains/between?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}${sort?("&sort="+sort):""}`);
+    const list=(r && r.trains) || [];
+    if(!list.length){ $("findResults").innerHTML='<div class="sub">No direct trains found between '+from+' and '+to+'.</div>'; return; }
+    $("findResults").innerHTML=`<h3>${list.length} direct train${list.length>1?"s":""}</h3><div class="sub">${from} → ${to}</div>`+list.map(t=>
+      `<div class="hit" data-num="${t.number}"><div class="dir-no">${t.number}</div><div class="dir-main"><div class="hit-name">${t.name||""}</div><div class="dir-route">Dep ${t.departure||"—"} · Arr ${t.arrival||"—"}${t.travel_time?" · "+t.travel_time:""}${t.classes?" · "+t.classes:""}</div></div></div>`
+    ).join("");
+    wireHits($("findResults"));
+  }catch(err){ $("findResults").innerHTML='<div class="sub">Search failed ('+err.message+').</div>'; }
+}
+async function doPNR(){
+  const digits=($("pnrQ").value.match(/\d/g)||[]).join("");
+  if(digits.length!==10){ $("pnrResults").innerHTML='<div class="sub">Enter a 10-digit PNR — e.g. 4512345678.</div>'; return; }
+  $("pnrResults").innerHTML='<div class="sub">Checking live status…</div>';
   try{
     const d=await getJSON(`/api/pnr/${digits}`);
-    if(!d || !d.train){ $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">No data returned for this PNR.</div>`; return; }
+    if(!d || !d.train){ $("pnrResults").innerHTML='<div class="sub">No data returned for this PNR.</div>'; return; }
     let html=`<h3>PNR ${digits}</h3><div class="sub">Live PNR status</div><div class="pnr-grid">
       <div class="pnr-cell"><div class="k">Train</div><div class="v">${d.train.number||"—"} · ${titleCase(d.train.name||"")}</div></div>
       <div class="pnr-cell"><div class="k">From → To</div><div class="v">${d.train.source||"—"} → ${d.train.destination||"—"}</div></div>
@@ -775,10 +820,8 @@ async function renderPNR(pnr){
     (d.passengers||[]).forEach(p=>{
       html+=`<div class="hit"><div class="dir-no">#${p.serial||""}</div><div class="dir-main"><div class="hit-name">Booking: ${p.booking_status||"—"}</div><div class="dir-route">Current: ${p.current_status||"—"}</div></div></div>`;
     });
-    $("resultBody").innerHTML=html;
-  }catch(err){
-    $("resultBody").innerHTML=`<h3>PNR ${digits}</h3><div class="sub">Live lookup failed (${err.message}). Try again in a moment.</div>`;
-  }
+    $("pnrResults").innerHTML=html;
+  }catch(err){ $("pnrResults").innerHTML='<div class="sub">Live lookup failed ('+err.message+'). Try again in a moment.</div>'; }
 }
 
 /* ============================ live data (TrainTrack, keyless) ============================ */
@@ -842,6 +885,38 @@ function scheduleRefresh(num){
   if(refreshTimer) clearTimeout(refreshTimer);
   refreshTimer=setTimeout(()=>{ if(mode==="live") loadTrain(num); }, AUTO_REFRESH_MS);
 }
+async function showExceptions(num){
+  try{
+    const e=await getJSON(`/api/trains/${num}/exceptions`);
+    const s=String((e && (e.message || e.exceptions || e.status)) || "").trim();
+    if(s && !/no exception|none|null|^ok$/i.test(s)) notice(s.slice(0,240));
+  }catch(e){}
+}
+let trackMarkers=[];
+async function trackTrains(){
+  const nums=$("trackInput").value.split(/[,\s]+/).map(s=>s.replace(/\D/g,"")).filter(Boolean).slice(0,10);
+  if(!nums.length) return;
+  initMap(); if(!map) return;
+  trackMarkers.forEach(m=>map.removeLayer(m)); trackMarkers=[];
+  $("mapNote").textContent="Tracking "+nums.length+" train(s)…";
+  try{
+    const r=await getJSON(`/api/map/tracking?trains=${nums.join(",")}`);
+    const arr=(r && (r.trains || r.data)) || (Array.isArray(r)?r:[]);
+    const pts=[];
+    arr.forEach(t=>{
+      const cp=t.current_position||{};
+      const lat=(t.lat!=null?t.lat:(cp.lat!=null?cp.lat:null));
+      const lng=(t.lng!=null?t.lng:(t.lon!=null?t.lon:(cp.lng!=null?cp.lng:(cp.lon!=null?cp.lon:null))));
+      if(typeof lat==="number" && typeof lng==="number"){
+        const mk=L.circleMarker([lat,lng],{radius:7,color:"#7a1f2b",weight:3,fillColor:"#e08a1e",fillOpacity:0.95}).addTo(map)
+          .bindPopup("<b>"+(t.number||t.train_number||"")+"</b> "+(t.name||t.train_name||""));
+        trackMarkers.push(mk); pts.push([lat,lng]);
+      }
+    });
+    if(pts.length){ map.fitBounds(L.latLngBounds(pts),{padding:[40,40]}); $("mapNote").textContent=pts.length+" train(s) plotted live. Basemap © OpenStreetMap contributors."; }
+    else { $("mapNote").textContent="No live coordinates returned for those trains."; }
+  }catch(err){ $("mapNote").textContent="Tracking failed ("+err.message+")."; }
+}
 
 /* ============================ controls ============================ */
 function setPlaying(p){
@@ -855,11 +930,16 @@ $("refreshBtn").onclick=()=>{ if(cur) loadTrain(cur.number); };
 $("refreshBtn2").onclick=()=>{ if(cur) loadTrain(cur.number); };
 $("themeBtn").onclick=()=>{ const h=document.documentElement; const n=h.getAttribute("data-theme")==="dark"?"light":"dark"; h.setAttribute("data-theme",n);
   $("themeIcon").setAttribute("d",n==="dark"?'M12 3v2M12 19v2M5 12H3M21 12h-2M6 6L4.5 4.5M19.5 19.5 18 18M6 18l-1.5 1.5M19.5 4.5 18 6M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z':'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'); render(); };
-$("modeSeg").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; searchMode=b.dataset.mode; [...$("modeSeg").children].forEach(x=>x.classList.toggle("active",x===b));
-  const inp=$("searchInput"); inp.value="";
-  inp.placeholder = searchMode==="train"?"Train number or name — e.g. 12951, Rajdhani": searchMode==="station"?"Station name or code — e.g. NDLS, Surat":"10-digit PNR — e.g. 4512345678"; };
 $("goBtn").onclick=doSearch;
 $("searchInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doSearch(); });
+$("findGo").onclick=findTrains;
+$("findQ").addEventListener("keydown",e=>{ if(e.key==="Enter") findTrains(); });
+$("betweenGo").onclick=findBetween;
+$("fromStn").addEventListener("keydown",e=>{ if(e.key==="Enter") findBetween(); });
+$("toStn").addEventListener("keydown",e=>{ if(e.key==="Enter") findBetween(); });
+$("pnrGo").onclick=doPNR;
+$("pnrQ").addEventListener("keydown",e=>{ if(e.key==="Enter") doPNR(); });
+$("trackGo").onclick=trackTrains;
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showView(t.dataset.view));
 
 /* settings */
@@ -879,7 +959,7 @@ function tick(ts){
   const chips=$("chips");
   chips.innerHTML=Object.values(TRAINS).slice(0,6).map(t=>`<span class="chip" data-num="${t.number}">${t.number} · ${t.from}</span>`).join("");
   chips.onclick=e=>{ const c=e.target.closest(".chip"); if(c) loadTrain(c.dataset.num); };
-  renderDirectory();
+  fillStationList();
   setFeed("demo");
   loadTrain("12951");
   requestAnimationFrame(tick);
